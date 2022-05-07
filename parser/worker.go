@@ -156,8 +156,8 @@ func (w Worker) ExportBlock(
 		}
 	}
 	w.logger.Debug("Block= ", "block", b.BlockID.Hash)
-	w.logger.Info("Events= ", r.BeginBlockEvents)
-	w.logger.Info("Txs= ", txs)
+	w.logger.Debug("Events= ", "events", r.BeginBlockEvents)
+	w.logger.Debug("Txs= ", "txs", txs)
 
 	// Export the transactions
 	return w.ExportEvents(r)
