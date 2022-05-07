@@ -173,7 +173,7 @@ func (w Worker) ExportBlock(
 	}
 
 	w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
-	w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
+	w.logger.Debug("EventsEndBlock", "events", r.BeginBlockEvents)
 	for _, tx := range txs {
 		for _, msg := range tx.Body.Messages {
 			var stdMsg sdk.Msg
@@ -181,7 +181,7 @@ func (w Worker) ExportBlock(
 			if err != nil {
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
-			w.logger.Debug("Message", "message", stdMsg)
+			w.logger.Debug("Message", "message", stdMsg.String())
 		}
 	}
 	return nil
