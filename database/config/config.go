@@ -38,10 +38,10 @@ func NewDatabaseConfig(
 // DefaultDatabaseConfig returns the default instance of Config
 func DefaultDatabaseConfig() Config {
 	return NewDatabaseConfig(
-		"database-name",
+		"archgregator",
 		"localhost",
 		5432,
-		"user",
+		"archgregator",
 		"password",
 		"",
 		"public",
