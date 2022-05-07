@@ -1,7 +1,7 @@
-CREATE TABLE validator
+CREATE TYPE COIN AS
 (
-    consensus_address TEXT NOT NULL PRIMARY KEY, /* Validator consensus address */
-    consensus_pubkey  TEXT NOT NULL UNIQUE /* Validator consensus public key */
+    denom  TEXT,
+    amount TEXT
 );
 
 CREATE TABLE block
@@ -10,91 +10,74 @@ CREATE TABLE block
     hash             TEXT                        NOT NULL UNIQUE,
     num_txs          INTEGER DEFAULT 0,
     total_gas        BIGINT  DEFAULT 0,
-    proposer_address TEXT REFERENCES validator (consensus_address),
+    proposer_address TEXT,
     timestamp        TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 CREATE INDEX block_height_index ON block (height);
 CREATE INDEX block_hash_index ON block (hash);
 CREATE INDEX block_proposer_address_index ON block (proposer_address);
 
-CREATE TABLE pre_commit
+
+CREATE TABLE wasm_code
 (
-    validator_address TEXT                        NOT NULL REFERENCES validator (consensus_address),
-    height            BIGINT                      NOT NULL,
-    timestamp         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    voting_power      BIGINT                      NOT NULL,
-    proposer_priority BIGINT                      NOT NULL,
-    UNIQUE (validator_address, timestamp)
+    sender                  TEXT            NOT NULL,
+    byte_code               TEXT            NOT NULL,
+    code_id                 BIGINT          NOT NULL UNIQUE,
+    height                  BIGINT          NOT NULL REFERENCES block (height)
 );
-CREATE INDEX pre_commit_validator_address_index ON pre_commit (validator_address);
-CREATE INDEX pre_commit_height_index ON pre_commit (height);
+CREATE INDEX wasm_code_height_index ON wasm_code (height);
 
-CREATE TABLE transaction
+
+CREATE TABLE wasm_contract
 (
-    hash         TEXT    NOT NULL,
-    height       BIGINT  NOT NULL REFERENCES block (height),
-    success      BOOLEAN NOT NULL,
+    sender                  TEXT            NOT NULL,
+    creator                 TEXT            NOT NULL,
+    admin                   TEXT            NOT NULL DEFAULT "",
+    code_id                 BIGINT          NOT NULL REFERENCES wasm_code (code_id),
+    label                   TEXT            NULL,
+    raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    funds                   COIN[]          NOT NULL DEFAULT '{}',
+    contract_address        TEXT            NOT NULL UNIQUE,
+    data                    JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    instantiated_at         TIMESTAMP       NOT NULL,
+    contract_info_extension JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    height                  BIGINT          NOT NULL REFERENCES block (height)
+);
+CREATE INDEX wasm_contract_height_index ON wasm_contract (height);
+CREATE INDEX wasm_contract_creator ON wasm_contract (creator);
+CREATE INDEX wasm_contract_contract_address ON wasm_contract (contract_address);
 
-    /* Body */
-    messages     JSONB   NOT NULL DEFAULT '[]'::JSONB,
-    memo         TEXT,
-    signatures   TEXT[]  NOT NULL,
 
-    /* AuthInfo */
-    signer_infos JSONB   NOT NULL DEFAULT '[]'::JSONB,
-    fee          JSONB   NOT NULL DEFAULT '{}'::JSONB,
-
-    /* Tx response */
-    gas_wanted   BIGINT           DEFAULT 0,
-    gas_used     BIGINT           DEFAULT 0,
-    raw_log      TEXT,
-    logs         JSONB,
-
-    /* PSQL partition */
-    partition_id BIGINT  NOT NULL DEFAULT 0,
-
-    CONSTRAINT unique_tx UNIQUE (hash, partition_id)
-) PARTITION BY LIST (partition_id);
-CREATE INDEX transaction_hash_index ON transaction (hash);
-CREATE INDEX transaction_height_index ON transaction (height);
-CREATE INDEX transaction_partition_id_index ON transaction (partition_id);
-
-CREATE TABLE message
+CREATE TABLE wasm_execute_contract
 (
-    transaction_hash            TEXT   NOT NULL,
-    index                       BIGINT NOT NULL,
-    type                        TEXT   NOT NULL,
-    value                       JSONB  NOT NULL,
-    involved_accounts_addresses TEXT[] NOT NULL,
+    sender                  TEXT            NOT NULL REFERENCES account (address),
+    contract_address        TEXT            NOT NULL REFERENCES wasm_contract (contract_address),
+    raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    funds                   COIN[]          NOT NULL DEFAULT '{}',
+    data                    JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    executed_at             TIMESTAMP       NOT NULL,
+    height                  BIGINT          NOT NULL REFERENCES block (height)
+);
+CREATE INDEX execute_contract_height_index ON execute_contract (height);
+CREATE INDEX execute_contract_contract_address ON execute_contract (contract_address);
 
-    /* PSQL partition */
-    partition_id                BIGINT NOT NULL DEFAULT 0,
-    height                      BIGINT NOT NULL,
-    FOREIGN KEY (transaction_hash, partition_id) REFERENCES transaction (hash, partition_id),
-    CONSTRAINT unique_message_per_tx UNIQUE (transaction_hash, index, partition_id)
-) PARTITION BY LIST (partition_id);
-CREATE INDEX message_transaction_hash_index ON message (transaction_hash);
-CREATE INDEX message_type_index ON message (type);
-CREATE INDEX message_involved_accounts_index ON message USING GIN(involved_accounts_addresses);
 
-/**
- * This function is used to find all the utils that involve any of the given addresses and have
- * type that is one of the specified types.
- */
-CREATE FUNCTION messages_by_address(
-    addresses TEXT[],
-    types TEXT[],
-    "limit" BIGINT = 100,
-    "offset" BIGINT = 0)
-    RETURNS SETOF message AS
-$$
-SELECT * FROM message
-WHERE (cardinality(types) = 0 OR type = ANY (types))
-  AND addresses && involved_accounts_addresses
-ORDER BY height DESC LIMIT "limit" OFFSET "offset"
-$$ LANGUAGE sql STABLE;
-
-CREATE TABLE pruning
+CREATE TABLE contract_rewards
 (
-    last_pruned_height BIGINT NOT NULL
-)
+    contract_address           TEXT    NOT NULL REFERENCES wasm_contract (contract_address),
+    reward_address             TEXT    NOT NULL,
+    developer_address          TEXT    NOT NULL,
+    block_height               BIGINT  NOT NULL REFERENCES block (height),
+    contract_rewards_amount    COIN[]  NOT NULL DEFAULT '{}',
+    inflation_rewardsAmount    COIN[]  NOT NULL DEFAULT '{}',
+    leftover_rewards_amount    COIN[]  NOT NULL DEFAULT '{}',
+    collect_premium            BOOLEAN,
+    gas_rebate_to_user         BOOLEAN,
+    premium_percentage_charged BIGINT,
+    metadata                   JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    gas_consumed               BIGINT  DEFAULT 0,
+);
+
+CREATE INDEX contract_rewards_contract_address_index ON contract_rewards (contract_address);
+CREATE INDEX contract_rewards_developer_address_index ON contract_rewards (developer_address);
+CREATE INDEX contract_rewards_reward_address_index ON contract_rewards (reward_address);
