@@ -181,7 +181,7 @@ func (w Worker) ExportBlock(
 			if err != nil {
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
-			w.logger.Debug("Message", "message", stdMsg.String())
+			w.logger.Debug("Message", "message", &stdMsg)
 		}
 	}
 	return nil
