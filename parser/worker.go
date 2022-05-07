@@ -13,7 +13,7 @@ import (
 
 	"github.com/nuclearblock/archgregator/modules"
 
-	//sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
@@ -119,6 +119,22 @@ func (w Worker) Process(height int64) error {
 	return w.ExportBlock(block, events, txs)
 }
 
+// ProcessTransactions fetches transactions for a given height and stores them into the database.
+// It returns an error if the export process fails.
+func (w Worker) ProcessTransactions(height int64) error {
+	block, err := w.node.Block(height)
+	if err != nil {
+		return fmt.Errorf("failed to get block from node: %s", err)
+	}
+
+	txs, err := w.node.Txs(block)
+	if err != nil {
+		return fmt.Errorf("failed to get transactions for block: %s", err)
+	}
+
+	return w.ExportTxs(txs)
+}
+
 // HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
 // in the order in which they have been registered.
 func (w Worker) HandleGenesis(genesisDoc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
@@ -155,17 +171,64 @@ func (w Worker) ExportBlock(
 			}
 		}
 	}
-	w.logger.Debug("Block= ", "block", b.BlockID.Hash)
-	w.logger.Debug("Events= ", "events", r.BeginBlockEvents)
-	w.logger.Debug("Txs= ", "txs", txs)
 
+	w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
+	w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
+	for _, tx := range txs {
+		for _, msg := range tx.Body.Messages {
+			var stdMsg sdk.Msg
+			err = w.codec.UnpackAny(msg, &stdMsg)
+			if err != nil {
+				return fmt.Errorf("error while unpacking message: %s", err)
+			}
+			w.logger.Debug("Message", "message", stdMsg)
+		}
+	}
+	return nil
 	// Export the transactions
-	return w.ExportEvents(r)
+	//return w.ExportTxs(txs)
 }
 
-// ExportEvents accepts block events and process it.
-// An error is returned if fails.
-func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
-	w.logger.Info("Events= ", r.Height)
+// ExportTxs accepts a slice of transactions and persists then inside the database.
+// An error is returned if the write fails.
+func (w Worker) ExportTxs(txs []*types.Tx) error {
+	// Handle all the transactions inside the block
+	for _, tx := range txs {
+		// Save the transaction itself
+		err := w.db.SaveTx(tx)
+		if err != nil {
+			return fmt.Errorf("failed to handle transaction with hash %s: %s", tx.TxHash, err)
+		}
+
+		// Call the tx handlers
+		for _, module := range w.modules {
+			if transactionModule, ok := module.(modules.TransactionModule); ok {
+				err = transactionModule.HandleTx(tx)
+				if err != nil {
+					w.logger.TxError(module, tx, err)
+				}
+			}
+		}
+
+		// Handle all the messages contained inside the transaction
+		for i, msg := range tx.Body.Messages {
+			var stdMsg sdk.Msg
+			err = w.codec.UnpackAny(msg, &stdMsg)
+			if err != nil {
+				return fmt.Errorf("error while unpacking message: %s", err)
+			}
+
+			// Call the handlers
+			for _, module := range w.modules {
+				if messageModule, ok := module.(modules.MessageModule); ok {
+					err = messageModule.HandleMsg(i, stdMsg, tx)
+					if err != nil {
+						w.logger.MsgError(module, tx, stdMsg, err)
+					}
+				}
+			}
+		}
+	}
+
 	return nil
 }
