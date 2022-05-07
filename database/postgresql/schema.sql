@@ -32,7 +32,7 @@ CREATE TABLE wasm_contract
 (
     sender                  TEXT            NOT NULL,
     creator                 TEXT            NOT NULL,
-    admin                   TEXT            NOT NULL DEFAULT "",
+    admin                   TEXT            NOT NULL DEFAULT '',
     code_id                 BIGINT          NOT NULL REFERENCES wasm_code (code_id),
     label                   TEXT            NULL,
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
@@ -50,7 +50,7 @@ CREATE INDEX wasm_contract_contract_address ON wasm_contract (contract_address);
 
 CREATE TABLE wasm_execute_contract
 (
-    sender                  TEXT            NOT NULL REFERENCES account (address),
+    sender                  TEXT            NOT NULL,
     contract_address        TEXT            NOT NULL REFERENCES wasm_contract (contract_address),
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     funds                   COIN[]          NOT NULL DEFAULT '{}',
@@ -58,8 +58,8 @@ CREATE TABLE wasm_execute_contract
     executed_at             TIMESTAMP       NOT NULL,
     height                  BIGINT          NOT NULL REFERENCES block (height)
 );
-CREATE INDEX execute_contract_height_index ON execute_contract (height);
-CREATE INDEX execute_contract_contract_address ON execute_contract (contract_address);
+CREATE INDEX execute_contract_height_index ON wasm_execute_contract (height);
+CREATE INDEX execute_contract_contract_address ON wasm_execute_contract (contract_address);
 
 
 CREATE TABLE contract_rewards
@@ -75,7 +75,7 @@ CREATE TABLE contract_rewards
     gas_rebate_to_user         BOOLEAN,
     premium_percentage_charged BIGINT,
     metadata                   JSONB   NOT NULL DEFAULT '{}'::JSONB,
-    gas_consumed               BIGINT  DEFAULT 0,
+    gas_consumed               BIGINT  DEFAULT 0
 );
 
 CREATE INDEX contract_rewards_contract_address_index ON contract_rewards (contract_address);
