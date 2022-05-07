@@ -3,7 +3,6 @@ module github.com/nuclearblock/archgregator
 go 1.17
 
 require (
-	github.com/CosmWasm/wasmd v0.22.0
 	github.com/cosmos/cosmos-sdk v0.45.1
 	github.com/cosmos/ibc-go/v3 v3.0.0
 	github.com/go-co-op/gocron v1.13.0
