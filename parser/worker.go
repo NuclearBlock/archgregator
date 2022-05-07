@@ -160,9 +160,9 @@ func (w Worker) ExportBlock(
 	return w.ExportEvents(r)
 }
 
-// ExportEvents accepts block events and process it. 
+// ExportEvents accepts block events and process it.
 // An error is returned if fails.
 func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
-	w.logger.Info("Events= ", r)
+	w.logger.Info("Events= ", r.Height)
 	return nil
 }
