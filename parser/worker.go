@@ -3,7 +3,6 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
-	"runtime/debug"
 
 	"github.com/nuclearblock/archgregator/logging"
 
@@ -14,7 +13,7 @@ import (
 
 	"github.com/nuclearblock/archgregator/modules"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	//sdk "github.com/cosmos/cosmos-sdk/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
@@ -165,5 +164,6 @@ func (w Worker) ExportBlock(
 // An error is returned if fails.
 func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
 
+	w.logger.Info("Events= ", r)
 	return nil
 }
