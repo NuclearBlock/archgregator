@@ -155,7 +155,7 @@ func (w Worker) ExportBlock(
 			}
 		}
 	}
-	w.logger.Info("Block= ", b.BlockID.Hash)
+	w.logger.Debug("Block= ", "block", b.BlockID.Hash)
 	w.logger.Info("Events= ", r.BeginBlockEvents)
 	w.logger.Info("Txs= ", txs)
 
