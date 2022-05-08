@@ -33,7 +33,7 @@ func sumGasTxs(txs []*types.Tx) uint64 {
 }
 
 // // GetContractInfo implements wasmsource.Source
-// func (s Source) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
+// func GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
 // 	ctx, err := s.LoadHeight(height)
 // 	if err != nil {
 // 		return nil, fmt.Errorf("error while loading height: %s", err)
@@ -53,7 +53,7 @@ func sumGasTxs(txs []*types.Tx) uint64 {
 // }
 
 // // GetContractInfo implements wasmsource.Source
-// func (s Source) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
+// func GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
 // 	res, err := s.wasmClient.ContractInfo(
 // 		remote.GetHeightRequestContext(s.Ctx, height),
 // 		&wasmtypes.QueryContractInfoRequest{

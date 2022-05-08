@@ -51,7 +51,7 @@ func HandleMsgStoreCode(index int, tx *types.Tx, msg *wasmtypes.MsgStoreCode, db
 		return fmt.Errorf("error while searching for AttributeKeyContractAddr: %s", err)
 	}
 
-	codeID, err := strconv.ParseUint(codeIDKey, 10, 64)
+	codeID, err := strconv.ParseInt(codeIDKey, 10, 64)
 	if err != nil {
 		return fmt.Errorf("error while parsing code id to uint64: %s", err)
 	}
@@ -87,7 +87,7 @@ func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgIns
 	}
 
 	// Get the contract info
-	contractInfo, err := source.GetContractInfo(tx.Height, contractAddress)
+	contractInfo, err := GetContractInfo(tx.Height, contractAddress)
 	if err != nil {
 		return fmt.Errorf("error while getting proposal: %s", err)
 	}
@@ -165,3 +165,43 @@ func HandleMsgUpdateAdmin(msg *wasmtypes.MsgUpdateAdmin, db database.Database) e
 func HandleMsgClearAdmin(msg *wasmtypes.MsgClearAdmin, db database.Database) error {
 	return db.UpdateContractAdmin(msg.Sender, msg.Contract, "")
 }
+
+
+// GetContractInfo implements wasmsource.Source
+func GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
+	
+	var err error
+	var cms sdk.CacheMultiStore
+	if height > 0 {
+		cms, err = k.Cms.CacheMultiStoreWithVersion(height)
+		if err != nil {
+			return sdk.Context{}, err
+		}
+	} else {
+		cms, err = k.Cms.CacheMultiStoreWithVersion(k.BlockStore.Height())
+		if err != nil {
+			return sdk.Context{}, err
+		}
+	}
+
+	ctx, err = sdk.NewContext(cms, tmproto.Header{}, false, k.Logger), nil
+	
+	ctx, err := s.LoadHeight(height)
+	if err != nil {
+		return nil, fmt.Errorf("error while loading height: %s", err)
+	}
+
+	res, err := s.q.ContractInfo(
+		sdk.WrapSDKContext(ctx),
+		&wasmtypes.QueryContractInfoRequest{
+			Address: contractAddr,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while getting contract info: %s", err)
+	}
+
+	return res, nil
+}	
+
+
