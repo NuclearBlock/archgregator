@@ -185,10 +185,11 @@ func (w Worker) ExportBlock(
 	// 	}
 	// }
 	for _, event := range r.BeginBlockEvents {
-		if event.Type == "coin_received" {
-			w.logger.Debug("Events", "event", event.String())
-			return nil
-		}
+		// if event.Type == "coin_received" {
+		// 	w.logger.Debug("Events", "event", event.String())
+		// 	return nil
+		// }
+		w.logger.Debug("Events", "event", event.String())
 	}
 	// Export the transactions
 	//return w.ExportTxs(txs)
