@@ -42,7 +42,7 @@ type Node struct {
 	client          *httpclient.HTTP
 	txServiceClient tx.ServiceClient
 	grpcConnection  *grpc.ClientConn
-	wasmClient 		wasmtypes.QueryClient
+	wasmClient      wasmtypes.QueryClient
 }
 
 // NewNode allows to build a new Node instance
@@ -74,7 +74,7 @@ func NewNode(cfg *Details, codec codec.Codec) (*Node, error) {
 		return nil, err
 	}
 
-	wasmClient :=  wasmtypes.NewQueryClient(grpcConnection)
+	wasmClient := wasmtypes.NewQueryClient(grpcConnection)
 
 	return &Node{
 		ctx:   context.Background(),
@@ -83,7 +83,7 @@ func NewNode(cfg *Details, codec codec.Codec) (*Node, error) {
 		client:          rpcClient,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
 		grpcConnection:  grpcConnection,
-		wasmClient:      wasmClient,	
+		wasmClient:      wasmClient,
 	}, nil
 }
 
@@ -255,7 +255,7 @@ func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 // GetContractInfo implements wasmsource.Source
 func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
 	res, err := cp.wasmClient.ContractInfo(
-		GetHeightRequestContext(s.Ctx, height),
+		GetHeightRequestContext(cp.ctx, height),
 		&wasmtypes.QueryContractInfoRequest{
 			Address: contractAddr,
 		},
