@@ -12,9 +12,9 @@ import (
 	"github.com/nuclearblock/archgregator/types/config"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	tmabcitypes "github.com/tendermint/tendermint/abci/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	tmabcitypes "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/nuclearblock/archgregator/node"
 	"github.com/nuclearblock/archgregator/types"
@@ -113,8 +113,6 @@ func (w Worker) Process(height int64) error {
 	return w.ExportBlock(block, events, txs)
 }
 
-
-
 // HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
 // in the order in which they have been registered.
 func (w Worker) HandleGenesis(genesisDoc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
@@ -142,7 +140,7 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
 
-			err = HandleMsg(i, stdMsg, tx, w.db)
+			err = HandleMsg(i, stdMsg, tx, w.node, w.db)
 			if err != nil {
 				w.logger.MsgError(tx, stdMsg, err)
 			}
@@ -155,7 +153,7 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 		if err != nil {
 			w.logger.Error("error while process event", err)
 		}
-	}	
+	}
 
 	// Export the transactions
 	//return w.ExportTxs(txs)
@@ -164,7 +162,6 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 
 func (w Worker) ProcessContractRewardEvent(evr *tmabcitypes.Event) error {
 	// TO-DO ...
-	
 	w.logger.Info("Processing events", "event", evr)
 	return nil
 }

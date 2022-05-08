@@ -7,6 +7,8 @@ import (
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
 	"github.com/nuclearblock/archgregator/types"
+
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 type Node interface {
@@ -54,6 +56,8 @@ type Node interface {
 	// cancel function and an error is returned. It is up to the caller to cancel
 	// the context and handle any errors appropriately.
 	SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error)
+
+	GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error)
 
 	// Stop defers the node stop execution to the client.
 	Stop()

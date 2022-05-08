@@ -31,38 +31,3 @@ func sumGasTxs(txs []*types.Tx) uint64 {
 
 	return totalGas
 }
-
-// // GetContractInfo implements wasmsource.Source
-// func GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
-// 	ctx, err := s.LoadHeight(height)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error while loading height: %s", err)
-// 	}
-
-// 	res, err := s.q.ContractInfo(
-// 		sdk.WrapSDKContext(ctx),
-// 		&wasmtypes.QueryContractInfoRequest{
-// 			Address: contractAddr,
-// 		},
-// 	)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error while getting contract info: %s", err)
-// 	}
-
-// 	return res, nil
-// }
-
-// // GetContractInfo implements wasmsource.Source
-// func GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
-// 	res, err := s.wasmClient.ContractInfo(
-// 		remote.GetHeightRequestContext(s.Ctx, height),
-// 		&wasmtypes.QueryContractInfoRequest{
-// 			Address: contractAddr,
-// 		},
-// 	)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error while getting contract info: %s", err)
-// 	}
-
-// 	return res, nil
-// }

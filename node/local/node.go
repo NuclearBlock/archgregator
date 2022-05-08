@@ -31,6 +31,7 @@ import (
 	"github.com/tendermint/tendermint/state/txindex/null"
 	"github.com/tendermint/tendermint/store"
 	tmtypes "github.com/tendermint/tendermint/types"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	"github.com/nuclearblock/archgregator/node"
 	"github.com/nuclearblock/archgregator/types"
@@ -530,6 +531,27 @@ func (cp *Node) SubscribeEvents(subscriber, query string) (<-chan tmctypes.Resul
 // SubscribeNewBlocks implements node.Node
 func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
+}
+
+
+// GetContractInfo implements node.Node
+func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
+	ctx, err := cp.LoadHeight(height)
+	if err != nil {
+		return nil, fmt.Errorf("error while loading height: %s", err)
+	}
+
+	res, err := cp.q.ContractInfo(
+		sdk.WrapSDKContext(ctx),
+		&wasmtypes.QueryContractInfoRequest{
+			Address: contractAddr,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while getting contract info: %s", err)
+	}
+
+	return res, nil
 }
 
 // Stop implements node.Node

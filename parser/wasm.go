@@ -10,10 +10,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/nuclearblock/archgregator/types"
 	database "github.com/nuclearblock/archgregator/database"
+	"github.com/nuclearblock/archgregator/node"
 )
 
 // HandleMsg implements modules.MessageModule
-func HandleMsg(index int, msg sdk.Msg, tx *types.Tx, db database.Database) error {
+func HandleMsg(index int, msg sdk.Msg, tx *types.Tx, node node.Node, db database.Database) error {
 	if len(tx.Logs) == 0 {
 		return nil
 	}
@@ -22,7 +23,7 @@ func HandleMsg(index int, msg sdk.Msg, tx *types.Tx, db database.Database) error
 	case *wasmtypes.MsgStoreCode:
 		return HandleMsgStoreCode(index, tx, cosmosMsg, db)
 	case *wasmtypes.MsgInstantiateContract:
-		return HandleMsgInstantiateContract(index, tx, cosmosMsg, db)
+		return HandleMsgInstantiateContract(index, tx, cosmosMsg, node, db)
 	case *wasmtypes.MsgExecuteContract:
 		return HandleMsgExecuteContract(index, tx, cosmosMsg, db)
 	case *wasmtypes.MsgMigrateContract:
@@ -63,7 +64,7 @@ func HandleMsgStoreCode(index int, tx *types.Tx, msg *wasmtypes.MsgStoreCode, db
 
 // HandleMsgInstantiateContract allows to properly handle a MsgInstantiateContract
 // Instantiate Contract Event instantiates an executable contract with the code previously stored with Store Code Event
-func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgInstantiateContract, db database.Database) error {
+func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgInstantiateContract, node node.Node, db database.Database) error {
 	// Get instantiate contract event
 	event, err := tx.FindEventByType(index, wasmtypes.EventTypeInstantiate)
 	if err != nil {
@@ -87,7 +88,7 @@ func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgIns
 	}
 
 	// Get the contract info
-	contractInfo, err := GetContractInfo(tx.Height, contractAddress)
+	contractInfo, err := node.GetContractInfo(tx.Height, contractAddress)
 	if err != nil {
 		return fmt.Errorf("error while getting proposal: %s", err)
 	}
@@ -165,43 +166,3 @@ func HandleMsgUpdateAdmin(msg *wasmtypes.MsgUpdateAdmin, db database.Database) e
 func HandleMsgClearAdmin(msg *wasmtypes.MsgClearAdmin, db database.Database) error {
 	return db.UpdateContractAdmin(msg.Sender, msg.Contract, "")
 }
-
-
-// GetContractInfo implements wasmsource.Source
-func GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
-	
-	var err error
-	var cms sdk.CacheMultiStore
-	if height > 0 {
-		cms, err = k.Cms.CacheMultiStoreWithVersion(height)
-		if err != nil {
-			return sdk.Context{}, err
-		}
-	} else {
-		cms, err = k.Cms.CacheMultiStoreWithVersion(k.BlockStore.Height())
-		if err != nil {
-			return sdk.Context{}, err
-		}
-	}
-
-	ctx, err = sdk.NewContext(cms, tmproto.Header{}, false, k.Logger), nil
-	
-	ctx, err := s.LoadHeight(height)
-	if err != nil {
-		return nil, fmt.Errorf("error while loading height: %s", err)
-	}
-
-	res, err := s.q.ContractInfo(
-		sdk.WrapSDKContext(ctx),
-		&wasmtypes.QueryContractInfoRequest{
-			Address: contractAddr,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("error while getting contract info: %s", err)
-	}
-
-	return res, nil
-}	
-
-

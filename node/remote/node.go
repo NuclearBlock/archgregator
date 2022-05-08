@@ -23,6 +23,8 @@ import (
 
 	"github.com/nuclearblock/archgregator/types"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	httpclient "github.com/tendermint/tendermint/rpc/client/http"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	jsonrpcclient "github.com/tendermint/tendermint/rpc/jsonrpc/client"
@@ -40,6 +42,7 @@ type Node struct {
 	client          *httpclient.HTTP
 	txServiceClient tx.ServiceClient
 	grpcConnection  *grpc.ClientConn
+	wasmClient 		wasmtypes.QueryClient
 }
 
 // NewNode allows to build a new Node instance
@@ -71,6 +74,8 @@ func NewNode(cfg *Details, codec codec.Codec) (*Node, error) {
 		return nil, err
 	}
 
+	wasmClient :=  wasmtypes.NewQueryClient(grpcConnection)
+
 	return &Node{
 		ctx:   context.Background(),
 		codec: codec,
@@ -78,6 +83,7 @@ func NewNode(cfg *Details, codec codec.Codec) (*Node, error) {
 		client:          rpcClient,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
 		grpcConnection:  grpcConnection,
+		wasmClient:      wasmClient,	
 	}, nil
 }
 
@@ -244,6 +250,21 @@ func (cp *Node) SubscribeEvents(subscriber, query string) (<-chan tmctypes.Resul
 // SubscribeNewBlocks implements node.Node
 func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
+}
+
+// GetContractInfo implements wasmsource.Source
+func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
+	res, err := cp.wasmClient.ContractInfo(
+		GetHeightRequestContext(s.Ctx, height),
+		&wasmtypes.QueryContractInfoRequest{
+			Address: contractAddr,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while getting contract info: %s", err)
+	}
+
+	return res, nil
 }
 
 // Stop implements node.Node
