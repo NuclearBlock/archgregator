@@ -4,10 +4,16 @@ CREATE TYPE COIN AS
     amount TEXT
 );
 
+CREATE TYPE ACCESS_CONFIG AS
+(
+    permission  INT,
+    address     TEXT
+);
+
 CREATE TABLE block
 (
     height           BIGINT UNIQUE PRIMARY KEY,
-    hash             TEXT                        NOT NULL UNIQUE,
+    hash             TEXT NOT NULL UNIQUE,
     num_txs          INTEGER DEFAULT 0,
     total_gas        BIGINT  DEFAULT 0,
     proposer_address TEXT,
@@ -20,8 +26,9 @@ CREATE INDEX block_proposer_address_index ON block (proposer_address);
 
 CREATE TABLE wasm_code
 (
-    sender                  TEXT            NOT NULL,
+    sender                  TEXT            NOT NULL REFERENCES account (address),
     byte_code               TEXT            NOT NULL,
+    instantiate_permission  ACCESS_CONFIG   NULL,
     code_id                 BIGINT          NOT NULL UNIQUE,
     height                  BIGINT          NOT NULL REFERENCES block (height)
 );
@@ -77,7 +84,6 @@ CREATE TABLE contract_rewards
     metadata                   JSONB   NOT NULL DEFAULT '{}'::JSONB,
     gas_consumed               BIGINT  DEFAULT 0
 );
-
 CREATE INDEX contract_rewards_contract_address_index ON contract_rewards (contract_address);
 CREATE INDEX contract_rewards_developer_address_index ON contract_rewards (developer_address);
 CREATE INDEX contract_rewards_reward_address_index ON contract_rewards (reward_address);
