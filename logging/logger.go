@@ -4,7 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
-	"github.com/nuclearblock/archgregator/modules"
 	"github.com/nuclearblock/archgregator/types"
 )
 
@@ -24,9 +23,9 @@ type Logger interface {
 	Debug(msg string, keyvals ...interface{})
 	Error(msg string, keyvals ...interface{})
 
-	GenesisError(module modules.Module, err error)
-	BlockError(module modules.Module, block *tmctypes.ResultBlock, err error)
-	EventsError(module modules.Module, results *tmctypes.ResultBlock, err error)
-	TxError(module modules.Module, tx *types.Tx, err error)
-	MsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error)
+	GenesisError(err error)
+	BlockError(block *tmctypes.ResultBlock, err error)
+	EventsError(results *tmctypes.ResultBlock, err error)
+	TxError(tx *types.Tx, err error)
+	MsgError(tx *types.Tx, msg sdk.Msg, err error)
 }

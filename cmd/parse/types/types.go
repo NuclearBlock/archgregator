@@ -8,12 +8,10 @@ import (
 
 	"github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/database/builder"
-	"github.com/nuclearblock/archgregator/modules/registrar"
 )
 
 // Config contains all the configuration for the "parse" command
 type Config struct {
-	registrar             registrar.Registrar
 	configParser          config.Parser
 	encodingConfigBuilder EncodingConfigBuilder
 	setupCfg              SdkConfigSetup
@@ -24,20 +22,6 @@ type Config struct {
 // NewConfig allows to build a new Config instance
 func NewConfig() *Config {
 	return &Config{}
-}
-
-// WithRegistrar sets the modules registrar to be used
-func (cfg *Config) WithRegistrar(r registrar.Registrar) *Config {
-	cfg.registrar = r
-	return cfg
-}
-
-// GetRegistrar returns the modules registrar to be used
-func (cfg *Config) GetRegistrar() registrar.Registrar {
-	if cfg.registrar == nil {
-		return &registrar.EmptyRegistrar{}
-	}
-	return cfg.registrar
 }
 
 // WithConfigParser sets the configuration parser to be used

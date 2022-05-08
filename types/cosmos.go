@@ -10,44 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx"
 )
 
-// Validator contains the data of a single validator
-type Validator struct {
-	ConsAddr   string
-	ConsPubKey string
-}
-
-// NewValidator allows to build a new Validator instance
-func NewValidator(consAddr string, consPubKey string) *Validator {
-	return &Validator{
-		ConsAddr:   consAddr,
-		ConsPubKey: consPubKey,
-	}
-}
-
-// -------------------------------------------------------------------------------------------------------------------
-
-// CommitSig contains the data of a single validator commit signature
-type CommitSig struct {
-	Height           int64
-	ValidatorAddress string
-	VotingPower      int64
-	ProposerPriority int64
-	Timestamp        time.Time
-}
-
-// NewCommitSig allows to build a new CommitSign object
-func NewCommitSig(validatorAddress string, votingPower, proposerPriority, height int64, timestamp time.Time) *CommitSig {
-	return &CommitSig{
-		Height:           height,
-		ValidatorAddress: validatorAddress,
-		VotingPower:      votingPower,
-		ProposerPriority: proposerPriority,
-		Timestamp:        timestamp,
-	}
-}
-
-// -------------------------------------------------------------------------------------------------------------------
-
 // Block contains the data of a single chain block
 type Block struct {
 	Height          int64

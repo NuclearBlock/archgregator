@@ -68,27 +68,6 @@ type Database struct {
 	Logger         logging.Logger
 }
 
-// createPartitionIfNotExists creates a new partition having the given partition id if not existing
-func (db *Database) createPartitionIfNotExists(table string, partitionID int64) error {
-	partitionTable := fmt.Sprintf("%s_%d", table, partitionID)
-
-	stmt := fmt.Sprintf(
-		"CREATE TABLE IF NOT EXISTS %s PARTITION OF %s FOR VALUES IN (%d)",
-		partitionTable,
-		table,
-		partitionID,
-	)
-	_, err := db.Sql.Exec(stmt)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// -------------------------------------------------------------------------------------------------------------------
-
 // HasBlock implements database.Database
 func (db *Database) HasBlock(height int64) (bool, error) {
 	var res bool
@@ -109,167 +88,125 @@ VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`
 	return err
 }
 
-// SaveTx implements database.Database
-func (db *Database) SaveTx(tx *types.Tx) error {
-	var partitionID int64
+// SaveWasmCode allows to store the wasm code from MsgStoreCode
+func (db *Database) SaveWasmCode(wasmCode types.WasmCode) error {
 
-	partitionSize := config.Cfg.Database.PartitionSize
-	if partitionSize > 0 {
-		partitionID = tx.Height / partitionSize
-		err := db.createPartitionIfNotExists("transaction", partitionID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return db.saveTxInsidePartition(tx, partitionID)
-}
-
-// saveTxInsidePartition stores the given transaction inside the partition having the given id
-func (db *Database) saveTxInsidePartition(tx *types.Tx, partitionId int64) error {
-	sqlStatement := `
-INSERT INTO transaction 
-(hash, height, success, messages, memo, signatures, signer_infos, fee, gas_wanted, gas_used, raw_log, logs, partition_id) 
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) 
-ON CONFLICT (hash, partition_id) DO UPDATE 
-	SET height = excluded.height, 
-		success = excluded.success, 
-		messages = excluded.messages,
-		memo = excluded.memo, 
-		signatures = excluded.signatures, 
-		signer_infos = excluded.signer_infos,
-		fee = excluded.fee, 
-		gas_wanted = excluded.gas_wanted, 
-		gas_used = excluded.gas_used,
-		raw_log = excluded.raw_log, 
-		logs = excluded.logs`
-
-	var sigs = make([]string, len(tx.Signatures))
-	for index, sig := range tx.Signatures {
-		sigs[index] = base64.StdEncoding.EncodeToString(sig)
-	}
-
-	var msgs = make([]string, len(tx.Body.Messages))
-	for index, msg := range tx.Body.Messages {
-		bz, err := db.EncodingConfig.Marshaler.MarshalJSON(msg)
-		if err != nil {
-			return err
-		}
-		msgs[index] = string(bz)
-	}
-	msgsBz := fmt.Sprintf("[%s]", strings.Join(msgs, ","))
-
-	feeBz, err := db.EncodingConfig.Marshaler.MarshalJSON(tx.AuthInfo.Fee)
-	if err != nil {
-		return fmt.Errorf("failed to JSON encode tx fee: %s", err)
-	}
-
-	var sigInfos = make([]string, len(tx.AuthInfo.SignerInfos))
-	for index, info := range tx.AuthInfo.SignerInfos {
-		bz, err := db.EncodingConfig.Marshaler.MarshalJSON(info)
-		if err != nil {
-			return err
-		}
-		sigInfos[index] = string(bz)
-	}
-	sigInfoBz := fmt.Sprintf("[%s]", strings.Join(sigInfos, ","))
-
-	logsBz, err := db.EncodingConfig.Amino.MarshalJSON(tx.Logs)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Sql.Exec(sqlStatement,
-		tx.TxHash, tx.Height, tx.Successful(),
-		msgsBz, tx.Body.Memo, pq.Array(sigs),
-		sigInfoBz, string(feeBz),
-		tx.GasWanted, tx.GasUsed, tx.RawLog, string(logsBz),
-		partitionId,
-	)
-	return err
-}
-
-// HasValidator implements database.Database
-func (db *Database) HasValidator(addr string) (bool, error) {
-	var res bool
-	stmt := `SELECT EXISTS(SELECT 1 FROM validator WHERE consensus_address = $1);`
-	err := db.Sql.QueryRow(stmt, addr).Scan(&res)
-	return res, err
-}
-
-// SaveValidators implements database.Database
-func (db *Database) SaveValidators(validators []*types.Validator) error {
-	if len(validators) == 0 {
-		return nil
-	}
-
-	stmt := `INSERT INTO validator (consensus_address, consensus_pubkey) VALUES `
-
-	var vparams []interface{}
-	for i, val := range validators {
-		vi := i * 2
-
-		stmt += fmt.Sprintf("($%d, $%d),", vi+1, vi+2)
-		vparams = append(vparams, val.ConsAddr, val.ConsPubKey)
-	}
-
-	stmt = stmt[:len(stmt)-1] // Remove trailing ,
-	stmt += " ON CONFLICT DO NOTHING"
-	_, err := db.Sql.Exec(stmt, vparams...)
-	return err
-}
-
-// SaveCommitSignatures implements database.Database
-func (db *Database) SaveCommitSignatures(signatures []*types.CommitSig) error {
-	if len(signatures) == 0 {
-		return nil
-	}
-
-	stmt := `INSERT INTO pre_commit (validator_address, height, timestamp, voting_power, proposer_priority) VALUES `
-
-	var sparams []interface{}
-	for i, sig := range signatures {
-		si := i * 5
-
-		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d),", si+1, si+2, si+3, si+4, si+5)
-		sparams = append(sparams, sig.ValidatorAddress, sig.Height, sig.Timestamp, sig.VotingPower, sig.ProposerPriority)
-	}
-
-	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (validator_address, timestamp) DO NOTHING"
-	_, err := db.Sql.Exec(stmt, sparams...)
-	return err
-}
-
-// SaveMessage implements database.Database
-func (db *Database) SaveMessage(msg *types.Message) error {
-	var partitionID int64
-	partitionSize := config.Cfg.Database.PartitionSize
-	if partitionSize > 0 {
-		partitionID = msg.Height / partitionSize
-		err := db.createPartitionIfNotExists("message", partitionID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return db.saveMessageInsidePartition(msg, partitionID)
-}
-
-// saveMessageInsidePartition stores the given message inside the partition having the provided id
-func (db *Database) saveMessageInsidePartition(msg *types.Message, partitionID int64) error {
 	stmt := `
-INSERT INTO message(transaction_hash, index, type, value, involved_accounts_addresses, height, partition_id) 
-VALUES ($1, $2, $3, $4, $5, $6, $7) 
-ON CONFLICT (transaction_hash, index, partition_id) DO UPDATE 
-	SET height = excluded.height, 
-		type = excluded.type,
-		value = excluded.value,
-		involved_accounts_addresses = excluded.involved_accounts_addresses`
+INSERT INTO wasm_code(sender, byte_code, instantiate_permission, code_id, height) 
+VALUES ($1, $2, $3, $4, $5) 
+ON CONFLICT DO NOTHING`
 
-	_, err := db.Sql.Exec(stmt, msg.TxHash, msg.Index, msg.Type, msg.Value, pq.Array(msg.Addresses), msg.Height, partitionID)
-	return err
+	// TO-DO: check if string(wasmCode.WasmByteCode) saved as string in DB
+
+	_, err := db.Sql.Exec(stmt,
+		wasmCode.Sender, string(wasmCode.WasmByteCode),
+		pq.Array(types.NewDbAccessConfig(wasmCode.InstantiatePermission)),
+		wasmCode.CodeID, wasmCode.Height,
+	)
+	if err != nil {
+		return fmt.Errorf("error while saving wasm code: %s", err)
+	}
+
+	return nil
 }
+
+// SaveWasmContract allows to store the wasm contract from MsgInstantiateContract
+func (db *Database) SaveWasmContract(wasmContract types.WasmContract) error {
+
+	stmt := `
+INSERT INTO wasm_contract 
+(sender, admin, code_id, label, raw_contract_message, funds, contract_address, data, instantiated_at, contract_info_extension, height) 
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+ON CONFLICT DO NOTHING`
+
+	ExtensionBz, err := db.EncodingConfig.Marshaler.MarshalJSON(wasmContract.ContractInfoExtension)
+	if err != nil {
+		return fmt.Errorf("error while marshaling contract info extension: %s", err)
+	}
+
+	// TO-DO: check if the below is stored as Json in DB:
+	// - Data
+	// - ContractInfoExtension
+	// - RawContractMsg
+
+	_, err = db.Sql.Exec(stmt,
+		wasmContract.Sender, wasmContract.Admin, wasmContract.CodeID, wasmContract.Label, string(wasmContract.RawContractMsg),
+		pq.Array(dbtypes.NewDbCoins(wasmContract.Funds)), wasmContract.ContractAddress, wasmContract.Data,
+		wasmContract.InstantiatedAt, string(ExtensionBz), wasmContract.Height,
+	)
+
+	if err != nil {
+		return fmt.Errorf("error while saving wasm contract: %s", err)
+	}
+
+	return nil
+}
+
+// SaveWasmExecuteContract allows to store the wasm contract from MsgExecuteeContract
+func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteContract) error {
+
+	stmt := `
+INSERT INTO wasm_execute_contract 
+(sender, contract_address, raw_contract_message, funds, data, executed_at, height) 
+VALUES ($1, $2, $3, $4, $5, $6, $7) 
+ON CONFLICT DO NOTHING`
+
+	// TO-DO: check if the below is stored as Json in DB:
+	// - Data
+
+	_, err := db.Sql.Exec(stmt,
+		executeContract.Sender, executeContract.ContractAddress, executeContract.RawContractMsg,
+		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)), executeContract.Data,
+		executeContract.ExecutedAt, executeContract.Height,
+	)
+
+	if err != nil {
+		return fmt.Errorf("error while saving wasm contract: %s", err)
+	}
+
+	return nil
+}
+
+func (db *Database) UpdateContractWithMsgMigrateContract(
+	sender string,
+	contractAddress string,
+	codeID uint64,
+	rawContractMsg []byte,
+	data string,
+) error {
+
+	stmt := `UPDATE wasm_contract SET 
+sender = $1, code_id = $2, raw_contract_message = $3, data = $4 
+WHERE contract_address = $5 `
+
+	// TO-DO: check if the below is stored as Json in DB:
+	// - rawContractMsg
+	// - Data
+
+	_, err := db.Sql.Exec(stmt,
+		sender, codeID, string(rawContractMsg), data,
+		contractAddress,
+	)
+	if err != nil {
+		return fmt.Errorf("error while updating wasm contract from contract migration: %s", err)
+
+	}
+	return nil
+}
+
+func (db *Database) UpdateContractAdmin(sender string, contractAddress string, newAdmin string) error {
+
+	stmt := `UPDATE wasm_contract SET 
+sender = $1, admin = $2 WHERE contract_address = $2 `
+
+	_, err := db.Sql.Exec(stmt, sender, newAdmin, contractAddress)
+	if err != nil {
+		return fmt.Errorf("error while updating wsm contract admin: %s", err)
+	}
+	return nil
+}
+
+
 
 // Close implements database.Database
 func (db *Database) Close() {

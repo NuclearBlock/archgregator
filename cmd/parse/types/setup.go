@@ -13,7 +13,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	modsregistrar "github.com/nuclearblock/archgregator/modules/registrar"
 )
 
 // GetParserContext setups all the things that can be used to later parse the chain state
@@ -52,12 +51,7 @@ func GetParserContext(cfg config.Config, parseConfig *Config) (*parser.Context, 
 		return nil, fmt.Errorf("error while setting logging level: %s", err)
 	}
 
-	// Get the modules
-	context := modsregistrar.NewContext(cfg, sdkConfig, &encodingConfig, db, cp, parseConfig.GetLogger())
-	mods := parseConfig.GetRegistrar().BuildModules(context)
-	registeredModules := modsregistrar.GetModules(mods, cfg.Chain.Modules, parseConfig.GetLogger())
-
-	return parser.NewContext(&encodingConfig, cp, db, parseConfig.GetLogger(), registeredModules), nil
+	return parser.NewContext(&encodingConfig, cp, db, parseConfig.GetLogger()), nil
 }
 
 // getConfig returns the SDK Config instance as well as if it's sealed or not
