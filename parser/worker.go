@@ -172,19 +172,24 @@ func (w Worker) ExportBlock(
 		}
 	}
 
-	w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
-	w.logger.Debug("EventsEndBlock", "events", r.BeginBlockEvents)
-	for _, tx := range txs {
-		for _, msg := range tx.Body.Messages {
-			var stdMsg sdk.Msg
-			err = w.codec.UnpackAny(msg, &stdMsg)
-			if err != nil {
-				return fmt.Errorf("error while unpacking message: %s", err)
-			}
-			w.logger.Debug("Message", "message", &stdMsg)
+	// w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
+	// w.logger.Debug("EventsEndBlock", "events", r.BeginBlockEvents)
+	// for _, tx := range txs {
+	// 	for _, msg := range tx.Body.Messages {
+	// 		var stdMsg sdk.Msg
+	// 		err = w.codec.UnpackAny(msg, &stdMsg)
+	// 		if err != nil {
+	// 			return fmt.Errorf("error while unpacking message: %s", err)
+	// 		}
+	// 		w.logger.Debug("Message", "message", &stdMsg)
+	// 	}
+	// }
+	for _, event := range r.BeginBlockEvents {
+		if event.Type == "coin_received" {
+			w.logger.Debug("Events", "event", event.String())
+			return nil
 		}
 	}
-	return nil
 	// Export the transactions
 	//return w.ExportTxs(txs)
 }
