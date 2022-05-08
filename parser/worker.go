@@ -190,10 +190,11 @@ func (w Worker) ExportBlock(
 		// 	return nil
 		// }
 		w.logger.Debug("Events", "event", event.String())
-		return nil
+
 	}
 	// Export the transactions
 	//return w.ExportTxs(txs)
+	return nil
 }
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
