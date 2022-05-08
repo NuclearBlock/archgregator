@@ -11,9 +11,7 @@ import (
 	"github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/types/config"
 
-	"github.com/nuclearblock/archgregator/modules"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	//sdk "github.com/cosmos/cosmos-sdk/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
@@ -25,12 +23,9 @@ import (
 // Worker defines a job consumer that is responsible for getting and
 // aggregating block and associated data and exporting it to a database.
 type Worker struct {
-	index int
-
-	queue   types.HeightQueue
-	codec   codec.Codec
-	modules []modules.Module
-
+	index  int
+	queue  types.HeightQueue
+	codec  codec.Codec
 	node   node.Node
 	db     database.Database
 	logger logging.Logger
@@ -39,13 +34,12 @@ type Worker struct {
 // NewWorker allows to create a new Worker implementation.
 func NewWorker(ctx *Context, queue types.HeightQueue, index int) Worker {
 	return Worker{
-		index:   index,
-		codec:   ctx.EncodingConfig.Marshaler,
-		node:    ctx.Node,
-		queue:   queue,
-		db:      ctx.Database,
-		modules: ctx.Modules,
-		logger:  ctx.Logger,
+		index:  index,
+		codec:  ctx.EncodingConfig.Marshaler,
+		node:   ctx.Node,
+		queue:  queue,
+		db:     ctx.Database,
+		logger: ctx.Logger,
 	}
 }
 
@@ -139,13 +133,13 @@ func (w Worker) ProcessTransactions(height int64) error {
 // in the order in which they have been registered.
 func (w Worker) HandleGenesis(genesisDoc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
 	// Call the genesis handlers
-	for _, module := range w.modules {
-		if genesisModule, ok := module.(modules.GenesisModule); ok {
-			if err := genesisModule.HandleGenesis(genesisDoc, appState); err != nil {
-				w.logger.GenesisError(module, err)
-			}
-		}
-	}
+	// for _, module := range w.modules {
+	// 	if genesisModule, ok := module.(modules.GenesisModule); ok {
+	// 		if err := genesisModule.HandleGenesis(genesisDoc, appState); err != nil {
+	// 			w.logger.GenesisError(module, err)
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }
@@ -163,14 +157,14 @@ func (w Worker) ExportBlock(
 	}
 
 	// Call the block handlers
-	for _, module := range w.modules {
-		if blockModule, ok := module.(modules.BlockModule); ok {
-			err = blockModule.HandleBlock(b, r, txs)
-			if err != nil {
-				w.logger.BlockError(module, b, err)
-			}
-		}
-	}
+	// for _, module := range w.modules {
+	// 	if blockModule, ok := module.(modules.BlockModule); ok {
+	// 		err = blockModule.HandleBlock(b, r, txs)
+	// 		if err != nil {
+	// 			w.logger.BlockError(module, b, err)
+	// 		}
+	// 	}
+	// }
 
 	// w.logger.Debug("EventsBeginBlock", "events", r.BeginBlockEvents)
 	// w.logger.Debug("EventsEndBlock", "events", r.BeginBlockEvents)
@@ -209,34 +203,45 @@ func (w Worker) ExportTxs(txs []*types.Tx) error {
 		}
 
 		// Call the tx handlers
-		for _, module := range w.modules {
-			if transactionModule, ok := module.(modules.TransactionModule); ok {
-				err = transactionModule.HandleTx(tx)
-				if err != nil {
-					w.logger.TxError(module, tx, err)
-				}
-			}
-		}
+		// for _, module := range w.modules {
+		// 	if transactionModule, ok := module.(modules.TransactionModule); ok {
+		// 		err = transactionModule.HandleTx(tx)
+		// 		if err != nil {
+		// 			w.logger.TxError(module, tx, err)
+		// 		}
+		// 	}
+		// }
 
-		// Handle all the messages contained inside the transaction
-		for i, msg := range tx.Body.Messages {
-			var stdMsg sdk.Msg
-			err = w.codec.UnpackAny(msg, &stdMsg)
-			if err != nil {
-				return fmt.Errorf("error while unpacking message: %s", err)
-			}
+		// // Handle all the messages contained inside the transaction
+		// for i, msg := range tx.Body.Messages {
+		// 	var stdMsg sdk.Msg
+		// 	err = w.codec.UnpackAny(msg, &stdMsg)
+		// 	if err != nil {
+		// 		return fmt.Errorf("error while unpacking message: %s", err)
+		// 	}
 
-			// Call the handlers
-			for _, module := range w.modules {
-				if messageModule, ok := module.(modules.MessageModule); ok {
-					err = messageModule.HandleMsg(i, stdMsg, tx)
-					if err != nil {
-						w.logger.MsgError(module, tx, stdMsg, err)
-					}
-				}
-			}
-		}
+		// 	//Call the handlers
+		// 	for _, module := range w.modules {
+		// 		if messageModule, ok := module.(modules.MessageModule); ok {
+		// 			err = messageModule.HandleMsg(i, stdMsg, tx)
+		// 			if err != nil {
+		// 				w.logger.MsgError(module, tx, stdMsg, err)
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
+	return nil
+}
+
+func ProcessContractRewardEvents(r *tmctypes.ResultBlockResults) error {
+
+	// rec, err := getContractRewardFromEvent(evr)
+	// if err != nil || rec == nil {
+	// 	// rec&err==nil: Nothing to process
+	// 	return err
+	// }
+	// todo ...
 	return nil
 }

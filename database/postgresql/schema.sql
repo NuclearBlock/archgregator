@@ -69,7 +69,7 @@ CREATE INDEX execute_contract_height_index ON wasm_execute_contract (height);
 CREATE INDEX execute_contract_contract_address ON wasm_execute_contract (contract_address);
 
 
-CREATE TABLE contract_rewards
+CREATE TABLE contract_reward
 (
     contract_address           TEXT    NOT NULL REFERENCES wasm_contract (contract_address),
     reward_address             TEXT    NOT NULL,
@@ -84,6 +84,6 @@ CREATE TABLE contract_rewards
     metadata                   JSONB   NOT NULL DEFAULT '{}'::JSONB,
     gas_consumed               BIGINT  DEFAULT 0
 );
-CREATE INDEX contract_rewards_contract_address_index ON contract_rewards (contract_address);
-CREATE INDEX contract_rewards_developer_address_index ON contract_rewards (developer_address);
-CREATE INDEX contract_rewards_reward_address_index ON contract_rewards (reward_address);
+CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
+CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);
+CREATE INDEX contract_reward_reward_address_index ON contract_reward (reward_address);
