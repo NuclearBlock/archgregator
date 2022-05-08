@@ -5,7 +5,6 @@ import (
 
 	parsecmdtypes "github.com/nuclearblock/archgregator/cmd/parse/types"
 
-	"github.com/nuclearblock/archgregator/modules"
 	nodeconfig "github.com/nuclearblock/archgregator/node/config"
 	"github.com/nuclearblock/archgregator/types/utils"
 )
@@ -57,14 +56,7 @@ file itself and not the on-chain data.`,
 				return err
 			}
 
-			for _, module := range parseCtx.Modules {
-				if module, ok := module.(modules.GenesisModule); ok {
-					err = module.HandleGenesis(genDoc, genState)
-					if err != nil {
-						return err
-					}
-				}
-			}
+			HandleGenesis(genDoc, genState)
 
 			return nil
 		},

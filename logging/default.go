@@ -7,12 +7,10 @@ import (
 	"github.com/gogo/protobuf/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/nuclearblock/archgregator/types"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
-
-	"github.com/nuclearblock/archgregator/modules"
-	"github.com/nuclearblock/archgregator/types"
 )
 
 var (
@@ -72,51 +70,49 @@ func (d *defaultLogger) Debug(msg string, keyVals ...interface{}) {
 
 // Error implements Logger
 func (d *defaultLogger) Error(msg string, keyVals ...interface{}) {
-	ErrorCount.Inc()
 	d.Logger.Error().Fields(getLogFields(keyVals...)).Msg(msg)
 }
 
 // GenesisError implements Logger
-func (d *defaultLogger) GenesisError(module modules.Module, err error) {
+func (d *defaultLogger) GenesisError(err error) {
 	d.Error("error while handling genesis",
 		"err", err,
-		LogKeyModule, module.Name(),
 	)
 }
 
 // BlockError implements Logger
-func (d *defaultLogger) BlockError(module modules.Module, block *tmctypes.ResultBlock, err error) {
+func (d *defaultLogger) BlockError(block *tmctypes.ResultBlock, err error) {
 	d.Error("error while handling block",
 		"err", err,
-		LogKeyModule, module.Name(),
-		LogKeyHeight, block.Block.Height,
+		LogKeyModule,
+		LogKeyHeight,
+		block.Block.Height,
 	)
 }
 
 // EventsError implements Logger
-func (d *defaultLogger) EventsError(module modules.Module, block *tmctypes.ResultBlock, err error) {
+func (d *defaultLogger) EventsError(block *tmctypes.ResultBlock, err error) {
 	d.Error("error while handling block events",
 		"err", err,
-		LogKeyModule, module.Name(),
-		LogKeyHeight, block.Block.Height,
+		LogKeyModule,
+		LogKeyHeight,
+		block.Block.Height,
 	)
 }
 
 // TxError implements Logger
-func (d *defaultLogger) TxError(module modules.Module, tx *types.Tx, err error) {
+func (d *defaultLogger) TxError(tx *types.Tx, err error) {
 	d.Error("error while handling transaction",
-		"err", err,
-		LogKeyModule, module.Name(),
+		"err", err, LogKeyModule,
 		LogKeyHeight, tx.Height,
 		LogKeyTxHash, tx.TxHash,
 	)
 }
 
 // MsgError implements Logger
-func (d *defaultLogger) MsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error) {
+func (d *defaultLogger) MsgError(tx *types.Tx, msg sdk.Msg, err error) {
 	d.Error("error while handling message",
-		"err", err,
-		LogKeyModule, module.Name(),
+		"err", err, LogKeyModule,
 		LogKeyHeight, tx.Height,
 		LogKeyTxHash, tx.TxHash,
 		LogKeyMsgType, proto.MessageName(msg),

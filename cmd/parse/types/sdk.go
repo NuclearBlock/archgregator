@@ -19,14 +19,6 @@ func DefaultConfigSetup(cfg config.Config, sdkConfig *sdk.Config) {
 		prefix,
 		prefix+sdk.PrefixPublic,
 	)
-	sdkConfig.SetBech32PrefixForValidator(
-		prefix+sdk.PrefixValidator+sdk.PrefixOperator,
-		prefix+sdk.PrefixValidator+sdk.PrefixOperator+sdk.PrefixPublic,
-	)
-	sdkConfig.SetBech32PrefixForConsensusNode(
-		prefix+sdk.PrefixValidator+sdk.PrefixConsensus,
-		prefix+sdk.PrefixValidator+sdk.PrefixConsensus+sdk.PrefixPublic,
-	)
 }
 
 // -----------------------------------------------------------------

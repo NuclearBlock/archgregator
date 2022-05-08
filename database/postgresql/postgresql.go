@@ -2,9 +2,9 @@ package postgresql
 
 import (
 	"database/sql"
-	"encoding/base64"
+	// "encoding/base64"
 	"fmt"
-	"strings"
+	//"strings"
 
 	"github.com/nuclearblock/archgregator/logging"
 
@@ -15,7 +15,8 @@ import (
 
 	"github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/types"
-	"github.com/nuclearblock/archgregator/types/config"
+	dbtypes "github.com/nuclearblock/archgregator/database/types"
+
 )
 
 // Builder creates a database connection with the given database connection info
@@ -100,7 +101,7 @@ ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(stmt,
 		wasmCode.Sender, string(wasmCode.WasmByteCode),
-		pq.Array(types.NewDbAccessConfig(wasmCode.InstantiatePermission)),
+		pq.Array(dbtypes.NewDbAccessConfig(wasmCode.InstantiatePermission)),
 		wasmCode.CodeID, wasmCode.Height,
 	)
 	if err != nil {

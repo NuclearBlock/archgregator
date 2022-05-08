@@ -13,10 +13,6 @@ import (
 	"github.com/nuclearblock/archgregator/logging"
 
 	"github.com/nuclearblock/archgregator/types/config"
-
-	"github.com/go-co-op/gocron"
-
-	"github.com/nuclearblock/archgregator/modules"
 	"github.com/nuclearblock/archgregator/parser"
 	"github.com/nuclearblock/archgregator/types"
 
@@ -39,16 +35,6 @@ func NewStartCmd(cmdCfg *parsecmdtypes.Config) *cobra.Command {
 				return err
 			}
 
-			// Run all the additional operations
-			for _, module := range context.Modules {
-				if module, ok := module.(modules.AdditionalOperationsModule); ok {
-					err = module.RunAdditionalOperations()
-					if err != nil {
-						return err
-					}
-				}
-			}
-
 			return StartParsing(context)
 		},
 	}
@@ -60,18 +46,6 @@ func StartParsing(ctx *parser.Context) error {
 	cfg := config.Cfg.Parser
 	logging.StartHeight.Add(float64(cfg.StartHeight))
 
-	// Start periodic operations
-	scheduler := gocron.NewScheduler(time.UTC)
-	for _, module := range ctx.Modules {
-		if module, ok := module.(modules.PeriodicOperationsModule); ok {
-			err := module.RegisterPeriodicOperations(scheduler)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	scheduler.StartAsync()
-
 	// Create a queue that will collect, aggregate, and export blocks and metadata
 	exportQueue := types.NewQueue(25)
 
@@ -82,13 +56,6 @@ func StartParsing(ctx *parser.Context) error {
 	}
 
 	waitGroup.Add(1)
-
-	// Run all the async operations
-	for _, module := range ctx.Modules {
-		if module, ok := module.(modules.AsyncOperationsModule); ok {
-			go module.RunAsyncOperations()
-		}
-	}
 
 	// Start each blocking worker in a go-routine where the worker consumes jobs
 	// off of the export queue.
@@ -132,18 +99,18 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, ctx *parser.Context) {
 
 	if cfg.FastSync {
 		ctx.Logger.Info("fast sync is enabled, ignoring all previous blocks", "latest_block_height", latestBlockHeight)
-		for _, module := range ctx.Modules {
-			if mod, ok := module.(modules.FastSyncModule); ok {
-				err = mod.DownloadState(latestBlockHeight)
-				if err != nil {
-					ctx.Logger.Error("error while performing fast sync",
-						"err", err,
-						"last_block_height", latestBlockHeight,
-						"module", module.Name(),
-					)
-				}
-			}
-		}
+		// for _, module := range ctx.Modules {
+		// 	if mod, ok := module.(modules.FastSyncModule); ok {
+		// 		err = mod.DownloadState(latestBlockHeight)
+		// 		if err != nil {
+		// 			ctx.Logger.Error("error while performing fast sync",
+		// 				"err", err,
+		// 				"last_block_height", latestBlockHeight,
+		// 				"module", module.Name(),
+		// 			)
+		// 		}
+		// 	}
+		// }
 	} else {
 		ctx.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
 		for i := cfg.StartHeight; i <= latestBlockHeight; i++ {
