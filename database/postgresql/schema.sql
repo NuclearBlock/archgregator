@@ -74,16 +74,16 @@ CREATE TABLE contract_reward
     contract_address           TEXT    NOT NULL REFERENCES wasm_contract (contract_address),
     reward_address             TEXT    NOT NULL,
     developer_address          TEXT    NOT NULL,
-    contract_rewards_amount    DOUBLE  NOT NULL,
-    inflation_rewardsAmount    DOUBLE  NOT NULL,
-    leftover_rewards_amount    DOUBLE  NOT NULL,
+    contract_rewards_amount    TEXT    NOT NULL,
+    inflation_rewardsAmount    TEXT    NOT NULL,
+    leftover_rewards_amount    TEXT    NOT NULL,
     collect_premium            BOOLEAN,
     gas_rebate_to_user         BOOLEAN,
     premium_percentage_charged BIGINT,
-    gas_consumed               BIGINT  DEFAULT 0
+    gas_consumed               BIGINT  DEFAULT 0,
     data_calculation_json      TEXT    NOT NULL DEFAULT '',
     data_distribution_json     TEXT    NOT NULL DEFAULT '',
-    height                     BIGINT  NOT NULL REFERENCES block (height),
+    height                     BIGINT  NOT NULL REFERENCES block (height)
 );
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
 CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);

@@ -15,7 +15,7 @@ import (
 // NewContractReward allows to build a new smart contract reward instance from archway.gastracker event
 func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database) error {
 
-	// We have to check if current event is Gastracker module reward event
+	// We have to check if the current event is Gastracker module reward event
 
 	// Firstly, try to catch reward calculation event
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {

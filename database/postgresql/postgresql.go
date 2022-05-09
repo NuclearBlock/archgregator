@@ -206,6 +206,9 @@ sender = $1, admin = $2 WHERE contract_address = $2 `
 }
 
 func (db *Database) SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error {
+
+	fmt.Printf("contractRewardCalculation: %+v\n", contractRewardCalculation)
+
 	stmt := `
 INSERT INTO contract_reward 
 (contract_address, reward_address, developer_address, contract_rewards_amount, inflation_rewardsAmount, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, dataCalculationJson, height) 
