@@ -7,9 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	//"google.golang.org/grpc/internal/metadata"
-	// coretypes "github.com/tendermint/tendermint/rpc/core/types"
-	// tmTypes "github.com/tendermint/tendermint/types"
 	database "github.com/nuclearblock/archgregator/database"
 	types "github.com/nuclearblock/archgregator/types"
 	tmabcitypes "github.com/tendermint/tendermint/abci/types"
@@ -24,63 +21,67 @@ func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database)
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {
 		fmt.Printf("event = %s\n", event.Type)
 
-		var metadataReward types.MetadataReward
+		var contractAddress string
+		var gasConsumed uint64
+		var contractRewards, inflationRewards types.GasTrackerReward
+		var metadataCalculationReward types.MetadataReward
+		var err error
+
 		// Get all event attributes
 		eventAttributes := event.GetAttributes()
 		// Handle all the atribution inside the event type
 		for _, attribute := range eventAttributes {
 			switch string(attribute.Key) {
 			case "contract_address":
-				contractAddress := HandleAddress(attribute.Value)
+				contractAddress = HandleAddress(attribute.Value)
 			case "gas_consumed":
-				gasConsumed, err := HandleGas(attribute.Value)
+				gasConsumed, err = HandleGas(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing gas consumed (calculation event): %s", err)
 				}
 			case "contract_rewards":
-				contractRewards, err := HandleRewards(attribute.Value)
+				contractRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing contract rewards (calculation event): %s", err)
 				}
 			case "inflation_rewards":
-				inflationRewards, err := HandleRewards(attribute.Value)
+				inflationRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing inflation rewards (calculation event): %s", err)
 				}
 			case "metadata":
-				metadataReward, err := HandleMetadata(attribute.Value)
+				metadataCalculationReward, err = HandleMetadata(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing metafata (calculation event): %s", err)
 				}
 			}
+
+			// eventJson is strng JSON of ContractRewardCalculationEvent
+			eventJson, err := GetEventJson(event)
+			if err != nil {
+				return fmt.Errorf("error while parsing event JSON (calculation event): %s", err)
+			}
+
+			// We have to decrement target block height,
+			// because reward is always processed in the next beginBlock
+			rewardCaculationHeight := height - 1
+
+			return db.SaveContractRewardCalculation(
+				types.NewContractRewardCalculation(
+					contractAddress,
+					metadataCalculationReward.RewardAddress,
+					metadataCalculationReward.DeveloperAddress,
+					gasConsumed,
+					contractRewards,
+					inflationRewards,
+					metadataCalculationReward.CollectPremium,
+					metadataCalculationReward.GasRebateToUser,
+					metadataCalculationReward.PremiumPercentageCharged,
+					eventJson,
+					rewardCaculationHeight,
+				),
+			)
 		}
-
-		// eventJson is strng JSON of ContractRewardCalculationEvent
-		eventJson, err := GetEventJson(event)
-		if err != nil {
-			return fmt.Errorf("error while parsing event JSON (calculation event): %s", err)
-		}
-
-		// We have to decrement target block height,
-		// because reward is always processed in the next beginBlock
-		rewardCaculationHeight := height - 1
-
-		return db.SaveContractRewardCalculation(
-			types.NewContractRewardCalculation(
-				contractAddress,
-				metadataReward.RewardAddress,
-				metadataReward.DeveloperAddress,
-				gasConsumed,
-				contractRewards,
-				inflationRewards,
-				metadataReward.CollectPremium,
-				metadataReward.GasRebateToUser,
-				metadataReward.PremiumPercentageCharged,
-				eventJson,
-				rewardCaculationHeight,
-			),
-		)
-
 	}
 
 	// Now try to catch reward distribution event
@@ -88,20 +89,25 @@ func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database)
 	// and update db row previously added with 'ContractRewardCalculationEvent'
 	if strings.Contains(event.Type, "archway.gastracker.v1.RewardDistributionEvent") {
 		fmt.Printf("event = %s\n", event.Type)
+
+		var contractDistributionAddress string
+		var contractDistributionRewards, leftoverRewards types.GasTrackerReward
+		var err error
+
 		// Get all event attributes
 		eventAttributes := event.GetAttributes()
 		// Handle all the atribution inside the event type
 		for _, attribute := range eventAttributes {
 			switch string(attribute.Key) {
 			case "reward_address":
-				contractAddress := HandleAddress(attribute.Value)
+				contractDistributionAddress = HandleAddress(attribute.Value)
 			case "contract_rewards":
-				contractDistributionRewards, err := HandleRewards(attribute.Value)
+				contractDistributionRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing contract rewards (distribution event): %s", err)
 				}
 			case "leftover_rewards":
-				leftoverRewards, err := HandleRewards(attribute.Value)
+				leftoverRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing leftover rewards (distribution event): %s", err)
 				}
@@ -120,7 +126,7 @@ func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database)
 
 		return db.SaveContractRewardDistribution(
 			types.NewContractRewardDistribution(
-				contractAddress,
+				contractDistributionAddress,
 				contractDistributionRewards,
 				leftoverRewards,
 				eventJson,
@@ -148,12 +154,14 @@ func HandleRewards(value []byte) (types.GasTrackerReward, error) {
 func HandleMetadata(value []byte) (types.MetadataReward, error) {
 	var metadata types.MetadataReward
 	json.Unmarshal([]byte(value), &metadata)
+	return metadata, nil
 }
 
 func GetEventJson(event *tmabcitypes.Event) (string, error) {
 	return "", nil
 }
 
+// This is a Cosmologger solution to get correct rewards data
 func getGasTrackerRewardFromString(str string) (types.GasTrackerReward, error) {
 	// Let's make it an array if not, to keep compatibility
 	if !strings.HasPrefix(str, "[") {

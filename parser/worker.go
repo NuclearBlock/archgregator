@@ -148,38 +148,30 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 	}
 
 	// Handle all the events inside the block and process to find contract rewards
-	for _, evr := range r.BeginBlockEvents {
-		err = w.ProcessContractRewardEvent(&evr)
-		if err != nil {
-			w.logger.Error("error while process event", err)
-		}
-	}
+	// for _, evr := range r.BeginBlockEvents {
+	// 	err = w.ProcessContractRewardEvent(&evr)
+	// 	if err != nil {
+	// 		w.logger.Error("error while process event", err)
+	// 	}
+	// }
 
 	// Export the transactions
 	//return w.ExportTxs(txs)
-	return nil
+
+	return w.ExportEvents(r)
 }
 
 func (w Worker) ProcessContractRewardEvent(evr *tmabcitypes.Event) error {
 	// TO-DO ...
-	HandleReward(evr)
-	//w.logger.Info("Processing events", "event", evr.String())
 	return nil
 }
 
-// // ========================= For fix-mode =========================
-// // ProcessTransactions fetches transactions for a given height and stores them into the database.
-// // It returns an error if the export process fails.
-// func (w Worker) ProcessTransactions(height int64) error {
-// 	block, err := w.node.Block(height)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to get block from node: %s", err)
-// 	}
-
-// 	txs, err := w.node.Txs(block)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to get transactions for block: %s", err)
-// 	}
-
-// 	return w.ExportTxs(txs)
-// }
+func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
+	for _, evr := range r.BeginBlockEvents {
+		err := HandleReward(&evr, uint64(r.Height), w.db)
+		if err != nil {
+			w.logger.Error("error while handle reward process", err)
+		}
+	}
+	return nil
+}
