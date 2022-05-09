@@ -77,7 +77,7 @@ func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database)
 					metadataCalculationReward.CollectPremium,
 					metadataCalculationReward.GasRebateToUser,
 					metadataCalculationReward.PremiumPercentageCharged,
-					eventJson,
+					string(eventJson),
 					rewardCaculationHeight,
 				),
 			)
@@ -129,7 +129,7 @@ func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database)
 				contractDistributionAddress,
 				contractDistributionRewards,
 				leftoverRewards,
-				eventJson,
+				string(eventJson),
 				rewardDistributionHeight,
 			),
 		)
@@ -157,8 +157,9 @@ func HandleMetadata(value []byte) (types.MetadataReward, error) {
 	return metadata, nil
 }
 
-func GetEventJson(event *tmabcitypes.Event) (string, error) {
-	return "", nil
+func GetEventJson(event *tmabcitypes.Event) ([]byte, error) {
+	// Try to Marshall event
+	return event.Marshal()
 }
 
 // This is a Cosmologger solution to get correct rewards data

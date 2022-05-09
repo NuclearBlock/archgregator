@@ -206,10 +206,49 @@ sender = $1, admin = $2 WHERE contract_address = $2 `
 }
 
 func (db *Database) SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error {
+	stmt := `
+INSERT INTO contract_reward 
+(contract_address, reward_address, developer_address, contract_rewards_amount, inflation_rewardsAmount, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, dataCalculationJson, height) 
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+ON CONFLICT DO NOTHING`
+
+	// TO-DO: check if the below is stored as Json in DB:
+	// - Data
+
+	_, err := db.Sql.Exec(
+		stmt,
+		contractRewardCalculation.ContractAddress,
+		contractRewardCalculation.RewardAddress,
+		contractRewardCalculation.DeveloperAddress,
+		contractRewardCalculation.ContractRewards.Amount,
+		contractRewardCalculation.InflationRewards.Amount,
+		contractRewardCalculation.CollectPremium,
+		contractRewardCalculation.GasRebateToUser,
+		contractRewardCalculation.PremiumPercentageCharged,
+		contractRewardCalculation.GasConsumed,
+		contractRewardCalculation.DataCalculationJson,
+		contractRewardCalculation.Height,
+	)
+
+	if err != nil {
+		return fmt.Errorf("error while saving contract reward: %s", err)
+	}
 	return nil
 }
 
 func (db *Database) SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error {
+	stmt := `UPDATE contract_reward SET 
+	leftover_rewards_amount = $1 dataDistributionJson = $2 WHERE contract_address = $3 AND height = $4 `
+
+	_, err := db.Sql.Exec(stmt,
+		contractRewardDistribution.LeftoverRewards,
+		contractRewardDistribution.DataDistributionJson,
+		contractRewardDistribution.ContractAddress,
+		contractRewardDistribution.Height,
+	)
+	if err != nil {
+		return fmt.Errorf("error while saving contract distribution rewards: %s", err)
+	}
 	return nil
 }
 

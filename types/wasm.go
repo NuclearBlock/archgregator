@@ -82,7 +82,8 @@ type WasmExecuteContract struct {
 	Height          int64
 }
 
-// NewWasmExecuteContract allows to build a new x/wasm execute contract instance from wasmtypes.MsgExecuteContract
+// NewWasmExecuteContract allows to build a new x/wasm execute contract instance 
+//from wasmtypes.MsgExecuteContract
 func NewWasmExecuteContract(
 	msg *wasmtypes.MsgExecuteContract,
 	data string,

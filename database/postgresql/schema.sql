@@ -81,8 +81,8 @@ CREATE TABLE contract_reward
     gas_rebate_to_user         BOOLEAN,
     premium_percentage_charged BIGINT,
     gas_consumed               BIGINT  DEFAULT 0
-    dataCalculation            JSONB   NOT NULL DEFAULT '{}'::JSONB,
-    dataDistribution           JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    dataCalculationJson        JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    dataDistributionJson       JSONB   NOT NULL DEFAULT '{}'::JSONB,
     height                     BIGINT  NOT NULL REFERENCES block (height),
 );
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
