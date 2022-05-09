@@ -152,12 +152,18 @@ func HandleRewards(value []byte) (types.GasTrackerReward, error) {
 }
 
 func HandleMetadata(value []byte) (*types.MetadataReward, error) {
-	var metadata types.MetadataReward
+	var metadata *types.MetadataReward
 	err := json.Unmarshal(value, &metadata)
 	if err != nil {
 		return nil, err
 	}
-	return &metadata, nil
+	return &types.MetadataReward{
+		DeveloperAddress:         metadata.DeveloperAddress,
+		RewardAddress:            metadata.RewardAddress,
+		GasRebateToUser:          metadata.GasRebateToUser,
+		CollectPremium:           metadata.CollectPremium,
+		PremiumPercentageCharged: metadata.PremiumPercentageCharged,
+	}, nil
 }
 
 func GetEventJson(event *tmabcitypes.Event) ([]byte, error) {
