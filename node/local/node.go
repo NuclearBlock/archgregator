@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/spf13/viper"
@@ -20,6 +21,7 @@ import (
 	tmmath "github.com/tendermint/tendermint/libs/math"
 	tmquery "github.com/tendermint/tendermint/libs/pubsub/query"
 	"github.com/tendermint/tendermint/privval"
+	//tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"github.com/tendermint/tendermint/proxy"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	sm "github.com/tendermint/tendermint/state"
@@ -31,7 +33,6 @@ import (
 	"github.com/tendermint/tendermint/state/txindex/null"
 	"github.com/tendermint/tendermint/store"
 	tmtypes "github.com/tendermint/tendermint/types"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	"github.com/nuclearblock/archgregator/node"
 	"github.com/nuclearblock/archgregator/types"
@@ -73,6 +74,8 @@ type Node struct {
 	consensusState *cs.State
 	txIndexer      txindex.TxIndexer
 	blockIndexer   indexer.BlockIndexer
+
+	wasmQuerier wasmtypes.QueryServer
 }
 
 // NewNode returns a new Node instance
@@ -169,6 +172,7 @@ func NewNode(config *Details, txConfig client.TxConfig, codec codec.Codec) (*Nod
 		blockStore:     blockStore,
 		txIndexer:      txIndexer,
 		blockIndexer:   blockIndexer,
+		wasmQuerier:    nil,
 	}, nil
 }
 
@@ -533,26 +537,27 @@ func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 }
 
-
 // GetContractInfo implements node.Node
 func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
-	ctx, err := cp.LoadHeight(height)
-	if err != nil {
-		return nil, fmt.Errorf("error while loading height: %s", err)
-	}
+	//ctx, err := LoadHeight(height)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error while loading height: %s", err)
+	// }
 
-	res, err := cp.q.ContractInfo(
-		sdk.WrapSDKContext(ctx),
-		&wasmtypes.QueryContractInfoRequest{
-			Address: contractAddr,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("error while getting contract info: %s", err)
-	}
+	// res, err := cp.q.ContractInfo(
+	// 	sdk.WrapSDKContext(<-cp.ctx.Done()),
+	// 	&wasmtypes.QueryContractInfoRequest{
+	// 		Address: contractAddr,
+	// 	},
+	// )
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error while getting contract info: %s", err)
+	// }
 
-	return res, nil
+	//return res, nil
+	return nil, nil
 }
+
 
 // Stop implements node.Node
 func (cp *Node) Stop() {

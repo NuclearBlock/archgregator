@@ -47,7 +47,7 @@ func NewSource(home string, encodingConfig *params.EncodingConfig) (*Source, err
 	if err != nil {
 		return nil, err
 	}
-
+	
 	tmCfg, err := parseConfig(home)
 	if err != nil {
 		return nil, err
