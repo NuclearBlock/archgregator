@@ -153,7 +153,7 @@ func HandleRewards(value []byte) (types.GasTrackerReward, error) {
 
 func HandleMetadata(value []byte) (types.MetadataReward, error) {
 	var metadata types.MetadataReward
-	json.Unmarshal([]byte(value), &metadata)
+	json.Unmarshal(value, &metadata)
 	return metadata, nil
 }
 
