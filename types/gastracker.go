@@ -10,7 +10,7 @@ type MetadataReward struct {
 	RewardAddress            string `json:"reward_address"`
 	GasRebateToUser          bool   `json:"gas_rebate_to_user"`
 	CollectPremium           bool   `json:"collect_premium"`
-	PremiumPercentageCharged uint64 `json:"premium_percentage_charged"`
+	PremiumPercentageCharged uint64 `json:"premium_percentage_charged,string"`
 }
 
 type ContractRewardCalculation struct {
