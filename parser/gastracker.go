@@ -33,23 +33,28 @@ func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database)
 		for _, attribute := range eventAttributes {
 			switch string(attribute.Key) {
 			case "contract_address":
-				contractAddress = HandleAddress(attribute.Value)
+				fmt.Print("Starting to handle contract_address...")
+				//contractAddress = HandleAddress(attribute.Value)
 			case "gas_consumed":
+				fmt.Print("Starting to handle gas_consumed...")
 				gasConsumed, err = HandleGas(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing gas consumed (calculation event): %s", err)
 				}
 			case "contract_rewards":
+				fmt.Print("Starting to handle contract_rewards...")
 				contractRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing contract rewards (calculation event): %s", err)
 				}
 			case "inflation_rewards":
+				fmt.Print("Starting to handle inflation_rewards...")
 				inflationRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing inflation rewards (calculation event): %s", err)
 				}
 			case "metadata":
+				fmt.Print("Starting to handle metadata...")
 				metadataCalculationReward, err = HandleMetadata(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing metafata (calculation event): %s", err)
