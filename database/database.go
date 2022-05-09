@@ -27,6 +27,9 @@ type Database interface {
 	UpdateContractWithMsgMigrateContract(sender string, contractAddress string, codeID uint64, rawContractMsg []byte, data string) error
 	UpdateContractAdmin(sender string, contractAddress string, newAdmin string) error
 
+	SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error
+	SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error
+
 	// Close closes the connection to the database
 	Close()
 }

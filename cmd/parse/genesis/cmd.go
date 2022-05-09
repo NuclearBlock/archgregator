@@ -32,11 +32,11 @@ file itself and not the on-chain data.`,
 			// Set the node to be of type None so that the node won't be built
 			cfg.Node.Type = nodeconfig.TypeNone
 
-			// Build the parsing context
-			parseCtx, err := parsecmdtypes.GetParserContext(cfg, parseConfig)
-			if err != nil {
-				return err
-			}
+			// // Build the parsing context
+			// parseCtx, err := parsecmdtypes.GetParserContext(cfg, parseConfig)
+			// if err != nil {
+			// 	return err
+			// }
 
 			// Get the file path
 			genesisFilePath := cfg.Parser.GenesisFilePath
@@ -56,7 +56,7 @@ file itself and not the on-chain data.`,
 				return err
 			}
 
-			HandleGenesis(genDoc, genState)
+			utils.HandleGenesis(genDoc, genState)
 
 			return nil
 		},

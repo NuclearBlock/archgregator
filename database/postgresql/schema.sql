@@ -26,7 +26,7 @@ CREATE INDEX block_proposer_address_index ON block (proposer_address);
 
 CREATE TABLE wasm_code
 (
-    sender                  TEXT            NOT NULL REFERENCES account (address),
+    sender                  TEXT            NOT NULL,
     byte_code               TEXT            NOT NULL,
     instantiate_permission  ACCESS_CONFIG   NULL,
     code_id                 BIGINT          NOT NULL UNIQUE,
@@ -74,15 +74,16 @@ CREATE TABLE contract_reward
     contract_address           TEXT    NOT NULL REFERENCES wasm_contract (contract_address),
     reward_address             TEXT    NOT NULL,
     developer_address          TEXT    NOT NULL,
-    block_height               BIGINT  NOT NULL REFERENCES block (height),
     contract_rewards_amount    COIN[]  NOT NULL DEFAULT '{}',
     inflation_rewardsAmount    COIN[]  NOT NULL DEFAULT '{}',
     leftover_rewards_amount    COIN[]  NOT NULL DEFAULT '{}',
     collect_premium            BOOLEAN,
     gas_rebate_to_user         BOOLEAN,
     premium_percentage_charged BIGINT,
-    metadata                   JSONB   NOT NULL DEFAULT '{}'::JSONB,
     gas_consumed               BIGINT  DEFAULT 0
+    dataCalculation            JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    dataDistribution           JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    height                     BIGINT  NOT NULL REFERENCES block (height),
 );
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
 CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);

@@ -162,7 +162,8 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 
 func (w Worker) ProcessContractRewardEvent(evr *tmabcitypes.Event) error {
 	// TO-DO ...
-	w.logger.Info("Processing events", "event", evr)
+	HandleReward(evr)
+	//w.logger.Info("Processing events", "event", evr.String())
 	return nil
 }
 

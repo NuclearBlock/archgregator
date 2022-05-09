@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	// "encoding/base64"
 	"fmt"
-	//"strings"
 
 	"github.com/nuclearblock/archgregator/logging"
 
@@ -14,9 +13,8 @@ import (
 	_ "github.com/lib/pq" // nolint
 
 	"github.com/nuclearblock/archgregator/database"
-	"github.com/nuclearblock/archgregator/types"
 	dbtypes "github.com/nuclearblock/archgregator/database/types"
-
+	"github.com/nuclearblock/archgregator/types"
 )
 
 // Builder creates a database connection with the given database connection info
@@ -207,7 +205,13 @@ sender = $1, admin = $2 WHERE contract_address = $2 `
 	return nil
 }
 
+func (db *Database) SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error {
+	return nil
+}
 
+func (db *Database) SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error {
+	return nil
+}
 
 // Close implements database.Database
 func (db *Database) Close() {

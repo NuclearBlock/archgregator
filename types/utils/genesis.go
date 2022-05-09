@@ -12,6 +12,10 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
+func HandleGenesis(genDoc *tmtypes.GenesisDoc, _ map[string]json.RawMessage) {
+	//TO-DO
+}
+
 // ReadGenesisFileGenesisDoc reads the genesis file located at the given path
 func ReadGenesisFileGenesisDoc(genesisPath string) (*tmtypes.GenesisDoc, error) {
 	var genesisDoc *tmtypes.GenesisDoc
