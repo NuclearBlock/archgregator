@@ -237,6 +237,9 @@ ON CONFLICT DO NOTHING`
 }
 
 func (db *Database) SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error {
+
+	fmt.Printf("contractRewardDistribution: %+v\n", contractRewardDistribution)
+
 	stmt := `UPDATE contract_reward SET 
 	leftover_rewards_amount = $1 dataDistributionJson = $2 WHERE contract_address = $3 AND height = $4 `
 
