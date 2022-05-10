@@ -6,11 +6,11 @@ type GasTrackerReward struct {
 }
 
 type MetadataReward struct {
-	DeveloperAddress         string `json:"developer_address"`
-	RewardAddress            string `json:"reward_address"`
-	GasRebateToUser          bool   `json:"gas_rebate_to_user"`
-	CollectPremium           bool   `json:"collect_premium"`
-	PremiumPercentageCharged uint64 `json:"premium_percentage_charged"`
+	DeveloperAddress         string `json:"developer_address,omitempty"`
+	RewardAddress            string `json:"reward_address,omitempty"`
+	GasRebateToUser          bool   `json:"gas_rebate_to_user,omitempty"`
+	CollectPremium           bool   `json:"collect_premium,omitempty"`
+	PremiumPercentageCharged uint64 `json:"premium_percentage_charged,string,omitempty"`
 }
 
 type ContractRewardCalculation struct {
@@ -27,7 +27,7 @@ type ContractRewardCalculation struct {
 	GasRebateToUser          bool
 	PremiumPercentageCharged uint64
 
-	DataCalculationJson string
+	DataCalculationJson []byte
 	Height              uint64
 }
 
@@ -42,7 +42,7 @@ func NewContractRewardCalculation(
 	collectPremium bool,
 	gasRebateToUser bool,
 	premiumPercentageCharged uint64,
-	dataCalculationJson string,
+	dataCalculationJson []byte,
 	height uint64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
@@ -64,7 +64,7 @@ type ContractRewardDistribution struct {
 	ContractAddress      string
 	ContractRewards      GasTrackerReward
 	LeftoverRewards      GasTrackerReward
-	DataDistributionJson string
+	DataDistributionJson []byte
 	Height               uint64
 }
 
@@ -73,7 +73,7 @@ func NewContractRewardDistribution(
 	contractAddress string,
 	contractReward GasTrackerReward,
 	leftoverRewards GasTrackerReward,
-	dataDistributionJson string,
+	dataDistributionJson []byte,
 	height uint64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
@@ -100,8 +100,8 @@ type ContractReward struct {
 	GasRebateToUser          bool
 	PremiumPercentageCharged uint64
 
-	DataCalculationJson  string
-	DataDistributionJson string
+	DataCalculationJson  []byte
+	DataDistributionJson []byte
 
 	Height uint64
 }

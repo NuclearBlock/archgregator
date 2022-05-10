@@ -143,20 +143,10 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 			err = HandleMsg(i, stdMsg, tx, w.node, w.db)
 			if err != nil {
 				w.logger.MsgError(tx, stdMsg, err)
+				return fmt.Errorf("error while handling tx message: %s", err)
 			}
 		}
 	}
-
-	// Handle all the events inside the block and process to find contract rewards
-	// for _, evr := range r.BeginBlockEvents {
-	// 	err = w.ProcessContractRewardEvent(&evr)
-	// 	if err != nil {
-	// 		w.logger.Error("error while process event", err)
-	// 	}
-	// }
-
-	// Export the transactions
-	//return w.ExportTxs(txs)
 
 	return w.ExportEvents(r)
 }
@@ -170,7 +160,7 @@ func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
 	for _, evr := range r.BeginBlockEvents {
 		err := HandleReward(&evr, uint64(r.Height), w.db)
 		if err != nil {
-			w.logger.Error("error while handle reward process", err)
+			return fmt.Errorf("error while unpacking message: %s", err)
 		}
 	}
 	return nil

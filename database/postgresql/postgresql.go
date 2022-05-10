@@ -234,7 +234,7 @@ ON CONFLICT DO NOTHING`
 	)
 
 	if err != nil {
-		return fmt.Errorf("error while saving contract reward: %s", err)
+		return fmt.Errorf("error while saving contract reward into DB: %s", err)
 	}
 	return nil
 }
