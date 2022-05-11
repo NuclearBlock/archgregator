@@ -1,16 +1,16 @@
-package messages
+package parser
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/forbole/juno/v3/database"
-	"github.com/forbole/juno/v3/types"
+	"github.com/nuclearblock/archgregator/database"
+	"github.com/nuclearblock/archgregator/types"
 )
 
 // HandleMsg represents a message handler that stores the given message inside the proper database table
-func HandleMsg(
+func HandleMsg1(
 	index int, msg sdk.Msg, tx *types.Tx,
 	parseAddresses MessageAddressesParser, cdc codec.Codec, db database.Database,
 ) error {

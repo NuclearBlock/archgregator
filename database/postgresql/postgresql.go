@@ -87,6 +87,18 @@ VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`
 	return err
 }
 
+// SaveTx implements database.Database
+func (db *Database) SaveTx(tx *types.Tx) error {
+	//TO-DO
+	return nil
+}
+
+// SaveMessage implements database.Database
+func (db *Database) SaveMessage(msg *types.Message) error {
+	//TO-DO
+	return nil
+}
+
 // SaveWasmCode allows to store the wasm code from MsgStoreCode
 func (db *Database) SaveWasmCode(wasmCode types.WasmCode) error {
 

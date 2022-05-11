@@ -21,6 +21,14 @@ type Database interface {
 	// An error is returned if the operation fails.
 	SaveBlock(block *types.Block) error
 
+	// SaveTx will be called to save each transaction contained inside a block.
+	// An error is returned if the operation fails.
+	SaveTx(tx *types.Tx) error
+
+	// SaveMessage stores a single message.
+	// An error is returned if the operation fails.
+	SaveMessage(msg *types.Message) error
+
 	SaveWasmCode(wasmCode types.WasmCode) error
 	SaveWasmContract(wasmContract types.WasmContract) error
 	SaveWasmExecuteContract(executeContract types.WasmExecuteContract) error
