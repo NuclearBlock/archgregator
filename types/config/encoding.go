@@ -7,11 +7,14 @@ import (
 )
 
 // MakeEncodingConfig creates an EncodingConfig to properly handle all the messages
-func MakeEncodingConfig() func() params.EncodingConfig {
+func MakeEncodingConfig(managers []module.BasicManager) func() params.EncodingConfig {
 	return func() params.EncodingConfig {
 		encodingConfig := params.MakeTestEncodingConfig()
 		std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 		std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+		manager := mergeBasicManagers(managers)
+		manager.RegisterLegacyAminoCodec(encodingConfig.Amino)
+		manager.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 		return encodingConfig
 	}
 }

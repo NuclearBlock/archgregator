@@ -6,12 +6,15 @@ import (
 	"github.com/nuclearblock/archgregator/cmd"
 	"github.com/nuclearblock/archgregator/cmd/parse/types"
 	"github.com/nuclearblock/archgregator/types/config"
+
+	cmdxapp "github.com/comdex-official/comdex/app"
+	gaiaapp "github.com/cosmos/gaia/v6/app"
 )
 
 func main() {
 
 	parseCfg := types.NewConfig().
-		WithEncodingConfigBuilder(config.MakeEncodingConfig())
+		WithEncodingConfigBuilder(config.MakeEncodingConfig(getBasicManagers()))
 
 	// archgregatorConfig the runner
 	config := cmd.NewConfig("archgregator").WithParseConfig(parseCfg)
@@ -24,12 +27,12 @@ func main() {
 	}
 }
 
-// // getBasicManagers returns the various basic managers that are used to register the encoding to
-// // support custom messages.
-// // This should be edited by custom implementations if needed.
-// func getBasicManagers() []module.BasicManager {
-// 	return []module.BasicManager{
-// 		gaiaapp.ModuleBasics,
-// 		cmdxapp.ModuleBasics,
-// 	}
-// }
+// getBasicManagers returns the various basic managers that are used to register the encoding to
+// support custom messages.
+// This should be edited by custom implementations if needed.
+func getBasicManagers() []module.BasicManager {
+	return []module.BasicManager{
+		gaiaapp.ModuleBasics,
+		cmdxapp.ModuleBasics,
+	}
+}
