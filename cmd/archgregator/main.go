@@ -10,10 +10,10 @@ import (
 
 func main() {
 
-	//parseCfg := types.NewConfig().WithEncodingConfigBuilder(config.MakeEncodingConfig)
+	parseCfg := types.NewConfig().WithEncodingConfigBuilder(config.MakeEncodingConfig)
 
 	// archgregatorConfig the runner
-	config := cmd.NewConfig("archgregator")//.WithParseConfig(parseCfg)
+	config := cmd.NewConfig("archgregator").WithParseConfig(parseCfg)
 
 	// Run the commands and panic on any error
 	exec := cmd.BuildDefaultExecutor(config)
