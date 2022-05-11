@@ -120,6 +120,7 @@ require (
 )
 
 replace (
+	
 	github.com/CosmWasm/wasmd => github.com/archway-network/wasmd v0.25.0-archway
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/rs/zerolog => github.com/rs/zerolog v1.21.0
