@@ -11,12 +11,37 @@ import (
 	database "github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/node"
 	types "github.com/nuclearblock/archgregator/types"
+	tmabcitypes "github.com/tendermint/tendermint/abci/types"
 )
+
+func HandleWasmEvent(evr *tmabcitypes.Event, tx *types.Tx) error {
+	if len(tx.Logs) == 0 {
+		return nil
+	}
+
+	//action, err := tx.FindAttributeByKey(evr, "action")
+
+	// switch cosmosMsg := evr.(type) {
+	// case *wasmtypes.MsgStoreCode:
+	// 	return HandleMsgStoreCode(index, tx, cosmosMsg, db)
+	// case *wasmtypes.MsgInstantiateContract:
+	// 	return HandleMsgInstantiateContract(index, tx, cosmosMsg, node, db)
+	// case *wasmtypes.MsgExecuteContract:
+	// 	return HandleMsgExecuteContract(index, tx, cosmosMsg, db)
+	// case *wasmtypes.MsgMigrateContract:
+	// 	return HandleMsgMigrateContract(index, tx, cosmosMsg, db)
+	// case *wasmtypes.MsgUpdateAdmin:
+	// 	return HandleMsgUpdateAdmin(cosmosMsg, db)
+	// case *wasmtypes.MsgClearAdmin:
+	// 	return HandleMsgClearAdmin(cosmosMsg, db)
+	// }
+	return nil
+}
 
 // HandleMsg implements modules.MessageModule
 func HandleWasmMsg(index int, msg sdk.Msg, tx *types.Tx, node node.Node, db database.Database) error {
-	fmt.Println(tx)
-	fmt.Println(msg.String())
+
+	fmt.Println(msg)
 
 	if len(tx.Logs) == 0 {
 		return nil

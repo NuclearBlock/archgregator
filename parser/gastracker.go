@@ -13,16 +13,15 @@ import (
 )
 
 // NewContractReward allows to build a new smart contract reward instance from archway.gastracker event
-func HandleReward(event *tmabcitypes.Event, height uint64, db database.Database) error {
+func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) error {
 
-	fmt.Println(event.Type)
 	// We have to check if the current event is Gastracker module reward event
 
 	// Firstly, try to catch reward calculation event
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {
 
 		var contractAddress string
-		var gasConsumed uint64
+		var gasConsumed int64
 		var contractRewards, inflationRewards types.GasTrackerReward
 		var metadataCalculationReward *types.MetadataReward
 		//var metadata map[string]interface{}
@@ -142,8 +141,8 @@ func HandleAddress(value []byte) string {
 	return string(value)
 }
 
-func HandleGas(value []byte) (uint64, error) {
-	return strconv.ParseUint(strings.Trim(string(value), "\""), 10, 64)
+func HandleGas(value []byte) (int64, error) {
+	return strconv.ParseInt(strings.Trim(string(value), "\""), 10, 64)
 }
 
 func HandleRewards(value []byte) (types.GasTrackerReward, error) {

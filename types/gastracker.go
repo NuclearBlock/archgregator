@@ -10,7 +10,7 @@ type MetadataReward struct {
 	RewardAddress            string `json:"reward_address,omitempty"`
 	GasRebateToUser          bool   `json:"gas_rebate_to_user,omitempty"`
 	CollectPremium           bool   `json:"collect_premium,omitempty"`
-	PremiumPercentageCharged uint64 `json:"premium_percentage_charged,string,omitempty"`
+	PremiumPercentageCharged int64  `json:"premium_percentage_charged,string,omitempty"`
 }
 
 type ContractRewardCalculation struct {
@@ -18,17 +18,17 @@ type ContractRewardCalculation struct {
 	RewardAddress    string
 	DeveloperAddress string
 
-	GasConsumed uint64
+	GasConsumed int64
 
 	ContractRewards  GasTrackerReward
 	InflationRewards GasTrackerReward
 
 	CollectPremium           bool
 	GasRebateToUser          bool
-	PremiumPercentageCharged uint64
+	PremiumPercentageCharged int64
 
 	DataCalculationJson []byte
-	Height              uint64
+	Height              int64
 }
 
 // NewContractRewardCalculation allows to easily create a new ContractRewardCalculation
@@ -36,14 +36,14 @@ func NewContractRewardCalculation(
 	contractAddress string,
 	rewardAddress string,
 	developerAddress string,
-	gasConsumed uint64,
+	gasConsumed int64,
 	contractReward GasTrackerReward,
 	inflationRewards GasTrackerReward,
 	collectPremium bool,
 	gasRebateToUser bool,
-	premiumPercentageCharged uint64,
+	premiumPercentageCharged int64,
 	dataCalculationJson []byte,
-	height uint64,
+	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
 		ContractAddress:          contractAddress,
@@ -65,7 +65,7 @@ type ContractRewardDistribution struct {
 	ContractRewards      GasTrackerReward
 	LeftoverRewards      GasTrackerReward
 	DataDistributionJson []byte
-	Height               uint64
+	Height               int64
 }
 
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
@@ -74,7 +74,7 @@ func NewContractRewardDistribution(
 	contractReward GasTrackerReward,
 	leftoverRewards GasTrackerReward,
 	dataDistributionJson []byte,
-	height uint64,
+	height int64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
 		ContractAddress:      contractAddress,
@@ -90,7 +90,7 @@ type ContractReward struct {
 	RewardAddress    string
 	DeveloperAddress string
 
-	GasConsumed uint64
+	GasConsumed int64
 
 	ContractRewards  GasTrackerReward
 	InflationRewards GasTrackerReward
@@ -98,10 +98,10 @@ type ContractReward struct {
 
 	CollectPremium           bool
 	GasRebateToUser          bool
-	PremiumPercentageCharged uint64
+	PremiumPercentageCharged int64
 
 	DataCalculationJson  []byte
 	DataDistributionJson []byte
 
-	Height uint64
+	Height int64
 }

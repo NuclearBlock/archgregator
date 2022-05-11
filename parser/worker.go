@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/nuclearblock/archgregator/logging"
 
@@ -132,25 +133,35 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 
 	// Handle all the transactions inside the block
 	for _, tx := range txs {
-		// Handle all the messages contained inside the transaction
-		for i, msg := range tx.Body.Messages {
+		// Handle all the events contained inside the transaction
+
+		for _, txEvent := range tx.Events {
+			if strings.Contains(txEvent.Type, "wasm") {
+				HandleWasmEvent(&txEvent, tx)
+			}
+		}
+
+
+		for _, msg := range tx.Body.Messages {
 			var stdMsg sdk.Msg
 			err := w.codec.UnpackAny(msg, &stdMsg)
 			if err != nil {
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
+			//w.codec.UnmarshalInterfaceJSON(msg, &stdMsg)
 
 			// err = HandleMsg(i, stdMsg, tx, w.codec, w.db)
 			// if err != nil {
 			// 	w.logger.MsgError(tx, stdMsg, err)
 			// }
 
-			err = HandleWasmMsg(i, stdMsg, tx, w.node, w.db)
-			if err != nil {
-				w.logger.MsgError(tx, stdMsg, err)
-				return fmt.Errorf("error while handling tx message: %s", err)
-			}
+			// err = HandleWasmMsg(i, stdMsg, tx, w.node, w.db)
+			// if err != nil {
+			// 	w.logger.MsgError(tx, stdMsg, err)
+			// 	return fmt.Errorf("error while handling tx message: %s", err)
+			// }
 		}
+
 	}
 
 	return w.ExportEvents(r)
@@ -163,10 +174,13 @@ func (w Worker) ProcessContractRewardEvent(evr *tmabcitypes.Event) error {
 
 func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
 	for _, evr := range r.BeginBlockEvents {
-		err := HandleReward(&evr, uint64(r.Height), w.db)
+		err := HandleReward(&evr, r.Height, w.db)
 		if err != nil {
 			return fmt.Errorf("error while unpacking message: %s", err)
 		}
+		// for _, evAttr := range evr.Attributes {
+		// 	fmt.Println(evAttr.String())
+		// }
 	}
 	return nil
 }
