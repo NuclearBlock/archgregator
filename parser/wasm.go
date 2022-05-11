@@ -8,13 +8,16 @@ import (
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	types "github.com/nuclearblock/archgregator/types"
 	database "github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/node"
+	types "github.com/nuclearblock/archgregator/types"
 )
 
 // HandleMsg implements modules.MessageModule
-func HandleMsg(index int, msg sdk.Msg, tx *types.Tx, node node.Node, db database.Database) error {
+func HandleWasmMsg(index int, msg sdk.Msg, tx *types.Tx, node node.Node, db database.Database) error {
+	fmt.Println(tx)
+	fmt.Println(msg.String())
+
 	if len(tx.Logs) == 0 {
 		return nil
 	}
@@ -99,8 +102,7 @@ func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgIns
 	}
 
 	return db.SaveWasmContract(
-		types.NewWasmContract(msg, contractAddress, string(resultDataBz), timestamp, contractInfo.Creator, contractInfo.Extension, tx.Height,
-		),
+		types.NewWasmContract(msg, contractAddress, string(resultDataBz), timestamp, contractInfo.Creator, contractInfo.Extension, tx.Height),
 	)
 }
 

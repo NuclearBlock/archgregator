@@ -139,12 +139,13 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 			if err != nil {
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
-			// err = messageModule.HandleMsg(i, stdMsg, tx)
+
+			// err = HandleMsg(i, stdMsg, tx, w.codec, w.db)
 			// if err != nil {
-			// 	w.logger.MsgError(module, tx, stdMsg, err)
+			// 	w.logger.MsgError(tx, stdMsg, err)
 			// }
 
-			err = HandleMsg(i, stdMsg, tx, w.node, w.db)
+			err = HandleWasmMsg(i, stdMsg, tx, w.node, w.db)
 			if err != nil {
 				w.logger.MsgError(tx, stdMsg, err)
 				return fmt.Errorf("error while handling tx message: %s", err)
