@@ -16,8 +16,6 @@ import (
 // HandleMsg implements modules.MessageModule
 func HandleWasmMsg(index int, msg sdk.Msg, tx *types.Tx, node node.Node, db database.Database) error {
 
-	fmt.Println(msg.String())
-
 	if len(tx.Logs) == 0 {
 		return nil
 	}
@@ -110,20 +108,21 @@ func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgIns
 // Execute Event executes an instantiated contract
 func HandleMsgExecuteContract(index int, tx *types.Tx, msg *wasmtypes.MsgExecuteContract, db database.Database) error {
 	// Get Execute Contract event
-	event, err := tx.FindEventByType(index, wasmtypes.EventTypeExecute)
-	if err != nil {
-		return fmt.Errorf("error while searching for EventTypeExecute: %s", err)
-	}
+	// event, err := tx.FindEventByType(index, wasmtypes.EventTypeExecute)
+	// if err != nil {
+	// 	return fmt.Errorf("error while searching for EventTypeExecute: %s", err)
+	// }
 
-	// Get result data
-	resultData, err := tx.FindAttributeByKey(event, wasmtypes.AttributeKeyResultDataHex)
-	if err != nil {
-		return fmt.Errorf("error while searching for AttributeKeyResultDataHex: %s", err)
-	}
-	resultDataBz, err := base64.StdEncoding.DecodeString(resultData)
-	if err != nil {
-		return fmt.Errorf("error while decoding result data: %s", err)
-	}
+	// // Get result data
+	//resultData, err := tx.FindAttributeByKey(event, wasmtypes.AttributeKeyResultDataHex)
+	// if err != nil {
+	// 	return fmt.Errorf("error while searching for AttributeKeyResultDataHex: %s", err)
+	// }
+	// resultDataBz, err := base64.StdEncoding.DecodeString(tx.RawLog)
+	// if err != nil {
+	// 	return fmt.Errorf("error while decoding result data: %s", err)
+	// }
+	txHash := tx.TxHash
 
 	timestamp, err := time.Parse(time.RFC3339, tx.Timestamp)
 	if err != nil {
@@ -131,7 +130,7 @@ func HandleMsgExecuteContract(index int, tx *types.Tx, msg *wasmtypes.MsgExecute
 	}
 
 	return db.SaveWasmExecuteContract(
-		types.NewWasmExecuteContract(msg, string(resultDataBz), timestamp, tx.Height),
+		types.NewWasmExecuteContract(msg, txHash, timestamp, tx.Height),
 	)
 }
 

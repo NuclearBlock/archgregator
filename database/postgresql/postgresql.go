@@ -158,7 +158,7 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 
 	stmt := `
 INSERT INTO wasm_execute_contract 
-(sender, contract_address, raw_contract_message, funds, data, executed_at, height) 
+(sender, contract_address, raw_contract_message, funds, tx_hash, executed_at, height) 
 VALUES ($1, $2, $3, $4, $5, $6, $7) 
 ON CONFLICT DO NOTHING`
 
@@ -167,7 +167,7 @@ ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(stmt,
 		executeContract.Sender, executeContract.ContractAddress, executeContract.RawContractMsg,
-		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)), executeContract.Data,
+		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)), executeContract.TxHash,
 		executeContract.ExecutedAt, executeContract.Height,
 	)
 

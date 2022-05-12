@@ -30,7 +30,7 @@ CREATE TABLE wasm_code
     byte_code               TEXT            NOT NULL,
     instantiate_permission  ACCESS_CONFIG   NULL,
     code_id                 BIGINT          NOT NULL UNIQUE,
-    height                  BIGINT          NOT NULL REFERENCES block (height)
+    height                  BIGINT          NOT NULL
 );
 CREATE INDEX wasm_code_height_index ON wasm_code (height);
 
@@ -40,7 +40,7 @@ CREATE TABLE wasm_contract
     sender                  TEXT            NOT NULL,
     creator                 TEXT            NOT NULL,
     admin                   TEXT            NOT NULL DEFAULT '',
-    code_id                 BIGINT          NOT NULL REFERENCES wasm_code (code_id),
+    code_id                 BIGINT          NOT NULL,
     label                   TEXT            NULL,
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     funds                   COIN[]          NOT NULL DEFAULT '{}',
@@ -48,7 +48,7 @@ CREATE TABLE wasm_contract
     data                    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     instantiated_at         TIMESTAMP       NOT NULL,
     contract_info_extension JSONB           NOT NULL DEFAULT '{}'::JSONB,
-    height                  BIGINT          NOT NULL REFERENCES block (height)
+    height                  BIGINT          NOT NULL
 );
 CREATE INDEX wasm_contract_height_index ON wasm_contract (height);
 CREATE INDEX wasm_contract_creator ON wasm_contract (creator);
@@ -58,12 +58,12 @@ CREATE INDEX wasm_contract_contract_address ON wasm_contract (contract_address);
 CREATE TABLE wasm_execute_contract
 (
     sender                  TEXT            NOT NULL,
-    contract_address        TEXT            NOT NULL REFERENCES wasm_contract (contract_address),
+    contract_address        TEXT            NOT NULL,
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     funds                   COIN[]          NOT NULL DEFAULT '{}',
-    data                    JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    tx_hash                 TEXT            NOT NULL,
     executed_at             TIMESTAMP       NOT NULL,
-    height                  BIGINT          NOT NULL REFERENCES block (height)
+    height                  BIGINT          NOT NULL
 );
 CREATE INDEX execute_contract_height_index ON wasm_execute_contract (height);
 CREATE INDEX execute_contract_contract_address ON wasm_execute_contract (contract_address);
@@ -71,7 +71,7 @@ CREATE INDEX execute_contract_contract_address ON wasm_execute_contract (contrac
 
 CREATE TABLE contract_reward
 (
-    contract_address           TEXT    NOT NULL REFERENCES wasm_contract (contract_address),
+    contract_address           TEXT    NOT NULL,
     reward_address             TEXT    NOT NULL,
     developer_address          TEXT    NOT NULL,
     contract_rewards_amount    COIN[]  NOT NULL DEFAULT '{}',
@@ -83,7 +83,7 @@ CREATE TABLE contract_reward
     gas_consumed               BIGINT  DEFAULT 0,
     data_calculation_json      JSONB   NOT NULL DEFAULT '{}'::JSONB,
     data_distribution_json     JSONB   NOT NULL DEFAULT '{}'::JSONB,
-    height                     BIGINT  NOT NULL REFERENCES block (height)
+    height                     BIGINT  NOT NULL
 );
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
 CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);

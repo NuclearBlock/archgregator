@@ -18,7 +18,7 @@ type ContractRewardCalculation struct {
 	RewardAddress    string
 	DeveloperAddress string
 
-	GasConsumed int64
+	GasConsumed string
 
 	ContractRewards  GasTrackerReward
 	InflationRewards GasTrackerReward
@@ -36,7 +36,7 @@ func NewContractRewardCalculation(
 	contractAddress string,
 	rewardAddress string,
 	developerAddress string,
-	gasConsumed int64,
+	gasConsumed string,
 	contractReward GasTrackerReward,
 	inflationRewards GasTrackerReward,
 	collectPremium bool,

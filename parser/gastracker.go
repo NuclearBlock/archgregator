@@ -3,8 +3,8 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 
-	"strconv"
 	"strings"
 
 	database "github.com/nuclearblock/archgregator/database"
@@ -21,7 +21,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {
 
 		var contractAddress string
-		var gasConsumed int64
+		var gasConsumed string
 		var contractRewards, inflationRewards types.GasTrackerReward
 		var metadataCalculationReward *types.MetadataReward
 		//var metadata map[string]interface{}
@@ -141,8 +141,14 @@ func HandleAddress(value []byte) string {
 	return string(value)
 }
 
-func HandleGas(value []byte) (int64, error) {
-	return strconv.ParseInt(strings.Trim(string(value), "\""), 10, 64)
+func HandleGas(value []byte) (string, error) {
+	reg, err := regexp.Compile(`[^0-9]`)
+	if err != nil {
+		return "", fmt.Errorf("error while converting gas_consumed (calculation event): %s", err)
+	}
+	num := reg.ReplaceAllString(string(value), "")
+	return num, nil
+	//return strconv.ParseInt(num, 10, 64)
 }
 
 func HandleRewards(value []byte) (types.GasTrackerReward, error) {
