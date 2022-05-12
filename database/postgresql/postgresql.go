@@ -166,9 +166,13 @@ ON CONFLICT DO NOTHING`
 	// - Data
 
 	_, err := db.Sql.Exec(stmt,
-		executeContract.Sender, executeContract.ContractAddress, executeContract.RawContractMsg,
-		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)), executeContract.TxHash,
-		executeContract.ExecutedAt, executeContract.Height,
+		executeContract.Sender,
+		executeContract.ContractAddress,
+		executeContract.RawContractMsg,
+		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)),
+		executeContract.TxHash,
+		executeContract.ExecutedAt,
+		executeContract.Height,
 	)
 
 	if err != nil {
@@ -223,7 +227,7 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 
 	stmt := `
 INSERT INTO contract_reward 
-(contract_address, reward_address, developer_address, contract_rewards_amount, inflation_rewardsAmount, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, dataCalculationJson, height) 
+(contract_address, reward_address, developer_address, contract_rewards_amount, inflation_rewardsAmount, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, data_calculation_json, height) 
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
 ON CONFLICT DO NOTHING`
 
@@ -256,7 +260,7 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 	fmt.Printf("contractRewardDistribution: %+v\n", contractRewardDistribution)
 
 	stmt := `UPDATE contract_reward SET 
-	leftover_rewards_amount = $1 dataDistributionJson = $2 WHERE contract_address = $3 AND height = $4 `
+	leftover_rewards_amount = $1 data_distribution_json = $2 WHERE contract_address = $3 AND height = $4 `
 
 	_, err := db.Sql.Exec(stmt,
 		contractRewardDistribution.LeftoverRewards,

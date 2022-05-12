@@ -1,9 +1,13 @@
 package types
 
-type GasTrackerReward struct {
-	Denom  string  `json:"denom"`
-	Amount float64 `json:"amount"`
-}
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+// type GasTrackerReward struct {
+// 	Denom  string  `json:"denom"`
+// 	Amount float64 `json:"amount"`
+// }
 
 type MetadataReward struct {
 	DeveloperAddress         string `json:"developer_address,omitempty"`
@@ -20,8 +24,8 @@ type ContractRewardCalculation struct {
 
 	GasConsumed string
 
-	ContractRewards  GasTrackerReward
-	InflationRewards GasTrackerReward
+	ContractRewards  sdk.Coins
+	InflationRewards sdk.Coins
 
 	CollectPremium           bool
 	GasRebateToUser          bool
@@ -37,8 +41,8 @@ func NewContractRewardCalculation(
 	rewardAddress string,
 	developerAddress string,
 	gasConsumed string,
-	contractReward GasTrackerReward,
-	inflationRewards GasTrackerReward,
+	contractReward sdk.Coins,
+	inflationRewards sdk.Coins,
 	collectPremium bool,
 	gasRebateToUser bool,
 	premiumPercentageCharged int64,
@@ -62,8 +66,8 @@ func NewContractRewardCalculation(
 
 type ContractRewardDistribution struct {
 	ContractAddress      string
-	ContractRewards      GasTrackerReward
-	LeftoverRewards      GasTrackerReward
+	ContractRewards      sdk.Coins
+	LeftoverRewards      sdk.Coins
 	DataDistributionJson []byte
 	Height               int64
 }
@@ -71,8 +75,8 @@ type ContractRewardDistribution struct {
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
 func NewContractRewardDistribution(
 	contractAddress string,
-	contractReward GasTrackerReward,
-	leftoverRewards GasTrackerReward,
+	contractReward sdk.Coins,
+	leftoverRewards sdk.Coins,
 	dataDistributionJson []byte,
 	height int64,
 ) ContractRewardDistribution {
@@ -92,9 +96,9 @@ type ContractReward struct {
 
 	GasConsumed int64
 
-	ContractRewards  GasTrackerReward
-	InflationRewards GasTrackerReward
-	LeftoverRewards  GasTrackerReward
+	ContractRewards  sdk.Coins
+	InflationRewards sdk.Coins
+	LeftoverRewards  sdk.Coins
 
 	CollectPremium           bool
 	GasRebateToUser          bool
