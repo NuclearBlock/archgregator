@@ -22,6 +22,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 
 		var contractAddress string
 		var gasConsumed string
+		var metadataJson []byte
 		var contractRewards, inflationRewards []types.GasTrackerReward
 		var metadataCalculationReward *types.MetadataReward
 		//var metadata map[string]interface{}
@@ -54,12 +55,12 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 				if err != nil {
 					return fmt.Errorf("error while handle metadata (calculation event): %s", err)
 				}
+				// eventJson is strng JSON of ContractRewardCalculationEvent
+				metadataJson, err = GetMetadataJson(attribute.Value)
+				if err != nil {
+					return fmt.Errorf("error while parsing metadata JSON (calculation event): %s", err)
+				}
 			}
-		}
-		// eventJson is strng JSON of ContractRewardCalculationEvent
-		eventJson, err := GetEventJson(event)
-		if err != nil {
-			return fmt.Errorf("error while parsing event JSON (calculation event): %s", err)
 		}
 
 		// We have to decrement target block height,
@@ -77,7 +78,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 				metadataCalculationReward.CollectPremium,
 				metadataCalculationReward.GasRebateToUser,
 				metadataCalculationReward.PremiumPercentageCharged,
-				eventJson,
+				metadataJson,
 				rewardCalculationHeight,
 			),
 		)
@@ -187,6 +188,9 @@ func HandleMetadata(value []byte) (*types.MetadataReward, error) {
 }
 
 func GetEventJson(event *tmabcitypes.Event) ([]byte, error) {
-	// Try to Marshall event
 	return event.Marshal()
+}
+
+func GetMetadataJson(metadata []byte) ([]byte, error) {
+	return metadata, nil
 }
