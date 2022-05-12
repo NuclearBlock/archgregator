@@ -1,7 +1,7 @@
 package types
 
 type GasTrackerReward struct {
-	Denom  string  `json:"denom"`
+	Denom  string `json:"denom"`
 	Amount string `json:"amount"`
 }
 
@@ -20,8 +20,8 @@ type ContractRewardCalculation struct {
 
 	GasConsumed string
 
-	ContractRewards  GasTrackerReward
-	InflationRewards GasTrackerReward
+	ContractRewards  []GasTrackerReward
+	InflationRewards []GasTrackerReward
 
 	CollectPremium           bool
 	GasRebateToUser          bool
@@ -37,8 +37,8 @@ func NewContractRewardCalculation(
 	rewardAddress string,
 	developerAddress string,
 	gasConsumed string,
-	contractReward GasTrackerReward,
-	inflationRewards GasTrackerReward,
+	contractReward []GasTrackerReward,
+	inflationRewards []GasTrackerReward,
 	collectPremium bool,
 	gasRebateToUser bool,
 	premiumPercentageCharged int64,
@@ -62,8 +62,8 @@ func NewContractRewardCalculation(
 
 type ContractRewardDistribution struct {
 	ContractAddress      string
-	ContractRewards      GasTrackerReward
-	LeftoverRewards      GasTrackerReward
+	ContractRewards      []GasTrackerReward
+	LeftoverRewards      []GasTrackerReward
 	DataDistributionJson []byte
 	Height               int64
 }
@@ -71,8 +71,8 @@ type ContractRewardDistribution struct {
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
 func NewContractRewardDistribution(
 	contractAddress string,
-	contractReward GasTrackerReward,
-	leftoverRewards GasTrackerReward,
+	contractReward []GasTrackerReward,
+	leftoverRewards []GasTrackerReward,
 	dataDistributionJson []byte,
 	height int64,
 ) ContractRewardDistribution {
@@ -92,9 +92,9 @@ type ContractReward struct {
 
 	GasConsumed int64
 
-	ContractRewards  GasTrackerReward
-	InflationRewards GasTrackerReward
-	LeftoverRewards  GasTrackerReward
+	ContractRewards  []GasTrackerReward
+	InflationRewards []GasTrackerReward
+	LeftoverRewards  []GasTrackerReward
 
 	CollectPremium           bool
 	GasRebateToUser          bool

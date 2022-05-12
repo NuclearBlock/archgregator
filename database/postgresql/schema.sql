@@ -80,7 +80,7 @@ CREATE TABLE contract_reward
     collect_premium            BOOLEAN,
     gas_rebate_to_user         BOOLEAN,
     premium_percentage_charged BIGINT,
-    gas_consumed               BIGINT  DEFAULT 0,
+    gas_consumed               TEXT    DEFAULT 0,
     data_calculation_json      JSONB   NOT NULL DEFAULT '{}'::JSONB,
     data_distribution_json     JSONB   NOT NULL DEFAULT '{}'::JSONB,
     height                     BIGINT  NOT NULL

@@ -239,12 +239,12 @@ ON CONFLICT DO NOTHING`
 		contractRewardCalculation.ContractAddress,
 		contractRewardCalculation.RewardAddress,
 		contractRewardCalculation.DeveloperAddress,
-		pq.Array(dbtypes.NewDbCoinFromGastracker(contractRewardCalculation.ContractRewards)),
-		pq.Array(dbtypes.NewDbCoinFromGastracker(contractRewardCalculation.InflationRewards)),
+		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardCalculation.ContractRewards)),
+		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardCalculation.InflationRewards)),
 		contractRewardCalculation.CollectPremium,
 		contractRewardCalculation.GasRebateToUser,
 		contractRewardCalculation.PremiumPercentageCharged,
-		contractRewardCalculation.GasConsumed,
+		string(contractRewardCalculation.GasConsumed),
 		contractRewardCalculation.DataCalculationJson,
 		contractRewardCalculation.Height,
 	)
@@ -264,7 +264,7 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 	WHERE contract_address = $3 AND height = $4 `
 
 	_, err := db.Sql.Exec(stmt,
-		pq.Array(dbtypes.NewDbCoinFromGastracker(contractRewardDistribution.LeftoverRewards)),
+		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardDistribution.LeftoverRewards)),
 		contractRewardDistribution.DataDistributionJson,
 		contractRewardDistribution.ContractAddress,
 		contractRewardDistribution.Height,

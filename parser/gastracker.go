@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+
 	"strings"
 
 	database "github.com/nuclearblock/archgregator/database"
@@ -21,7 +22,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 
 		var contractAddress string
 		var gasConsumed string
-		var contractRewards, inflationRewards types.GasTrackerReward
+		var contractRewards, inflationRewards []types.GasTrackerReward
 		var metadataCalculationReward *types.MetadataReward
 		//var metadata map[string]interface{}
 		var err error
@@ -88,7 +89,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 	if strings.Contains(event.Type, "archway.gastracker.v1.RewardDistributionEvent") {
 
 		var contractDistributionAddress string
-		var contractDistributionRewards, leftoverRewards types.GasTrackerReward
+		var contractDistributionRewards, leftoverRewards []types.GasTrackerReward
 		var err error
 
 		// Get all event attributes
@@ -150,8 +151,29 @@ func HandleGas(value []byte) (string, error) {
 	//return strconv.ParseInt(num, 10, 64)
 }
 
-func HandleRewards(value []byte) (types.GasTrackerReward, error) {
-	return getGasTrackerRewardFromString(string(value))
+// Not sure why the rewards are stored both using an array and without ...
+// so this is a Cosmologger-based solution to get correct rewards data
+func HandleRewards(value []byte) ([]types.GasTrackerReward, error) {
+	str := string(value)
+	// Let's make it an array if not, to keep compatibility
+	if !strings.HasPrefix(str, "[") {
+		str = "[" + str + "]"
+	}
+
+	var tmpMapArr []map[string]interface{}
+	if err := json.Unmarshal([]byte(str), &tmpMapArr); err != nil {
+		return []types.GasTrackerReward{}, err
+	}
+
+	if len(tmpMapArr) == 0 {
+		return []types.GasTrackerReward{}, fmt.Errorf("no GasTrackerReward found")
+	}
+
+	Coins := make([]types.GasTrackerReward, 0)
+	for _, coin := range tmpMapArr {
+		Coins = append(Coins, types.GasTrackerReward{Denom: coin["denom"].(string), Amount: coin["amount"].(string)})
+	}
+	return Coins, nil
 }
 
 func HandleMetadata(value []byte) (*types.MetadataReward, error) {

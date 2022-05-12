@@ -51,14 +51,6 @@ func NewDbCoin(coin sdk.Coin) DbCoin {
 	}
 }
 
-// NewDbCoins build a new DbCoins object starting from an array of coins
-func NewDbCoinFromGastracker(coin types.GasTrackerReward) DbCoin {
-	return DbCoin{
-		Denom:  coin.Denom,
-		Amount: string(coin.Amount),
-	}
-}
-
 // Equal tells whether coin and d represent the same coin with the same amount
 func (coin DbCoin) Equal(d DbCoin) bool {
 	return coin.Denom == d.Denom && coin.Amount == d.Amount
@@ -102,6 +94,15 @@ func NewDbCoins(coins sdk.Coins) DbCoins {
 		dbCoins = append(dbCoins, &DbCoin{Amount: coin.Amount.String(), Denom: coin.Denom})
 	}
 	return dbCoins
+}
+
+// NewDbCoins build a new DbCoins object starting from an array of coins
+func NewDbCoinsFromGastracker(coins []types.GasTrackerReward) DbCoins {
+	DbCoins := make([]*DbCoin, 0)
+	for _, coin := range coins {
+		DbCoins = append(DbCoins, &DbCoin{Amount: coin.Amount, Denom: coin.Denom})
+	}
+	return DbCoins
 }
 
 // Equal tells whether c and d contain the same items in the same order
