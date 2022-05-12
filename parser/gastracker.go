@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	database "github.com/nuclearblock/archgregator/database"
 	types "github.com/nuclearblock/archgregator/types"
 	tmabcitypes "github.com/tendermint/tendermint/abci/types"
@@ -22,7 +21,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 
 		var contractAddress string
 		var gasConsumed string
-		var contractRewards, inflationRewards sdk.Coins
+		var contractRewards, inflationRewards types.GasTrackerReward
 		var metadataCalculationReward *types.MetadataReward
 		//var metadata map[string]interface{}
 		var err error
@@ -151,9 +150,8 @@ func HandleGas(value []byte) (string, error) {
 	//return strconv.ParseInt(num, 10, 64)
 }
 
-func HandleRewards(value sdk.Coins) (sdk.Coins, error) {
-	return value, nil
-	//return getGasTrackerRewardFromString(string(value))
+func HandleRewards(value []byte) (types.GasTrackerReward, error) {
+	return getGasTrackerRewardFromString(string(value))
 }
 
 func HandleMetadata(value []byte) (*types.MetadataReward, error) {

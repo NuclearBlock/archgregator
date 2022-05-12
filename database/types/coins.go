@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	types "github.com/nuclearblock/archgregator/types"
 )
 
 func ToString(value sql.NullString) string {
@@ -47,6 +48,14 @@ func NewDbCoin(coin sdk.Coin) DbCoin {
 	return DbCoin{
 		Denom:  coin.Denom,
 		Amount: coin.Amount.String(),
+	}
+}
+
+// NewDbCoins build a new DbCoins object starting from an array of coins
+func NewDbCoinFromGastracker(coin types.GasTrackerReward) DbCoin {
+	return DbCoin{
+		Denom:  coin.Denom,
+		Amount: string(coin.Amount),
 	}
 }
 

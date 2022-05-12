@@ -3,7 +3,6 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/nuclearblock/archgregator/types"
@@ -35,13 +34,13 @@ func getGasTrackerRewardFromString(str string) (types.GasTrackerReward, error) {
 	}
 	tmpMap := tmpMapArr[0]
 
-	numValue, err := strconv.ParseFloat(tmpMap["amount"].(string), 64)
-	if err != nil {
-		return types.GasTrackerReward{}, err
-	}
+	//numValue, err := strconv.ParseFloat(tmpMap["amount"].(string), 64)
+	// if err != nil {
+	// 	return types.GasTrackerReward{}, err
+	// }
 
 	return types.GasTrackerReward{
 		Denom:  tmpMap["denom"].(string),
-		Amount: numValue,
+		Amount: tmpMap["amount"].(string),
 	}, nil
 }

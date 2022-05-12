@@ -239,8 +239,8 @@ ON CONFLICT DO NOTHING`
 		contractRewardCalculation.ContractAddress,
 		contractRewardCalculation.RewardAddress,
 		contractRewardCalculation.DeveloperAddress,
-		contractRewardCalculation.ContractRewards.Amount,
-		contractRewardCalculation.InflationRewards.Amount,
+		pq.Array(dbtypes.NewDbCoinFromGastracker(contractRewardCalculation.ContractRewards)),
+		pq.Array(dbtypes.NewDbCoinFromGastracker(contractRewardCalculation.InflationRewards)),
 		contractRewardCalculation.CollectPremium,
 		contractRewardCalculation.GasRebateToUser,
 		contractRewardCalculation.PremiumPercentageCharged,
@@ -260,10 +260,11 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 	fmt.Printf("contractRewardDistribution: %+v\n", contractRewardDistribution)
 
 	stmt := `UPDATE contract_reward SET 
-	leftover_rewards_amount = $1 data_distribution_json = $2 WHERE contract_address = $3 AND height = $4 `
+	leftover_rewards_amount = $1 data_distribution_json = $2 
+	WHERE contract_address = $3 AND height = $4 `
 
 	_, err := db.Sql.Exec(stmt,
-		contractRewardDistribution.LeftoverRewards,
+		pq.Array(dbtypes.NewDbCoinFromGastracker(contractRewardDistribution.LeftoverRewards)),
 		contractRewardDistribution.DataDistributionJson,
 		contractRewardDistribution.ContractAddress,
 		contractRewardDistribution.Height,
