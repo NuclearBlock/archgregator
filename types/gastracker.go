@@ -27,8 +27,8 @@ type ContractRewardCalculation struct {
 	GasRebateToUser          bool
 	PremiumPercentageCharged int64
 
-	DataCalculationJson []byte
-	Height              int64
+	MetadataJson []byte
+	Height       int64
 }
 
 // NewContractRewardCalculation allows to easily create a new ContractRewardCalculation
@@ -42,7 +42,7 @@ func NewContractRewardCalculation(
 	collectPremium bool,
 	gasRebateToUser bool,
 	premiumPercentageCharged int64,
-	dataCalculationJson []byte,
+	metadataJson []byte,
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
@@ -55,17 +55,16 @@ func NewContractRewardCalculation(
 		CollectPremium:           collectPremium,
 		GasRebateToUser:          gasRebateToUser,
 		PremiumPercentageCharged: premiumPercentageCharged,
-		DataCalculationJson:      dataCalculationJson,
+		MetadataJson:             metadataJson,
 		Height:                   height,
 	}
 }
 
 type ContractRewardDistribution struct {
-	ContractAddress      string
-	ContractRewards      []GasTrackerReward
-	LeftoverRewards      []GasTrackerReward
-	DataDistributionJson []byte
-	Height               int64
+	ContractAddress string
+	ContractRewards []GasTrackerReward
+	LeftoverRewards []GasTrackerReward
+	Height          int64
 }
 
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
@@ -73,15 +72,13 @@ func NewContractRewardDistribution(
 	contractAddress string,
 	contractReward []GasTrackerReward,
 	leftoverRewards []GasTrackerReward,
-	dataDistributionJson []byte,
 	height int64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
-		ContractAddress:      contractAddress,
-		ContractRewards:      contractReward,
-		LeftoverRewards:      leftoverRewards,
-		DataDistributionJson: dataDistributionJson,
-		Height:               height,
+		ContractAddress: contractAddress,
+		ContractRewards: contractReward,
+		LeftoverRewards: leftoverRewards,
+		Height:          height,
 	}
 }
 
@@ -100,8 +97,7 @@ type ContractReward struct {
 	GasRebateToUser          bool
 	PremiumPercentageCharged int64
 
-	DataCalculationJson  []byte
-	DataDistributionJson []byte
+	MetadataJson []byte
 
 	Height int64
 }

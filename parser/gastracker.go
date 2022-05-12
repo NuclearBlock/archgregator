@@ -55,11 +55,8 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 				if err != nil {
 					return fmt.Errorf("error while handle metadata (calculation event): %s", err)
 				}
-				// eventJson is strng JSON of ContractRewardCalculationEvent
-				metadataJson, err = GetMetadataJson(attribute.Value)
-				if err != nil {
-					return fmt.Errorf("error while parsing metadata JSON (calculation event): %s", err)
-				}
+				// metadataJson is strng JSON of ContractRewardCalculationEvent
+				metadataJson = attribute.Value
 			}
 		}
 
@@ -113,12 +110,6 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 			}
 		}
 
-		// eventJson is strng JSON of ContractRewardCalculationEvent
-		eventJson, err := GetEventJson(event)
-		if err != nil {
-			return fmt.Errorf("error while parsing event JSON (calculation event): %s", err)
-		}
-
 		// We have to decrement target block height,
 		// because reward is always processed in the next beginBlock
 		rewardDistributionHeight := height - 1
@@ -128,7 +119,6 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 				contractDistributionAddress,
 				contractDistributionRewards,
 				leftoverRewards,
-				eventJson,
 				rewardDistributionHeight,
 			),
 		)
@@ -185,12 +175,4 @@ func HandleMetadata(value []byte) (*types.MetadataReward, error) {
 		return nil, err
 	}
 	return &metadata, nil
-}
-
-func GetEventJson(event *tmabcitypes.Event) ([]byte, error) {
-	return event.Marshal()
-}
-
-func GetMetadataJson(metadata []byte) ([]byte, error) {
-	return metadata, nil
 }
