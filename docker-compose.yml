@@ -3,6 +3,7 @@ services:
   postgres:
     container_name: postgres
     image: postgres:latest
+    command: ["postgres", "-c", "log_statement=all"]
     environment:
       - POSTGRES_DB=archway
       - POSTGRES_USER=archway

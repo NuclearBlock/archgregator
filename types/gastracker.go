@@ -61,24 +61,24 @@ func NewContractRewardCalculation(
 }
 
 type ContractRewardDistribution struct {
-	ContractAddress string
-	ContractRewards []GasTrackerReward
-	LeftoverRewards []GasTrackerReward
-	Height          int64
+	RewardAddress      string
+	DistributedRewards []GasTrackerReward
+	LeftoverRewards    []GasTrackerReward
+	Height             int64
 }
 
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
 func NewContractRewardDistribution(
-	contractAddress string,
-	contractReward []GasTrackerReward,
+	rewardAddress string,
+	distributedRewards []GasTrackerReward,
 	leftoverRewards []GasTrackerReward,
 	height int64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
-		ContractAddress: contractAddress,
-		ContractRewards: contractReward,
-		LeftoverRewards: leftoverRewards,
-		Height:          height,
+		RewardAddress:      rewardAddress,
+		DistributedRewards: distributedRewards,
+		LeftoverRewards:    leftoverRewards,
+		Height:             height,
 	}
 }
 
@@ -89,9 +89,10 @@ type ContractReward struct {
 
 	GasConsumed int64
 
-	ContractRewards  []GasTrackerReward
-	InflationRewards []GasTrackerReward
-	LeftoverRewards  []GasTrackerReward
+	ContractRewards    []GasTrackerReward
+	InflationRewards   []GasTrackerReward
+	DistributedRewards []GasTrackerReward
+	LeftoverRewards    []GasTrackerReward
 
 	CollectPremium           bool
 	GasRebateToUser          bool

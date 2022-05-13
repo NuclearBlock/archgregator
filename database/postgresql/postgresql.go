@@ -227,7 +227,7 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 
 	stmt := `
 INSERT INTO contract_reward 
-(contract_address, reward_address, developer_address, contract_rewards_amount, inflation_rewardsAmount, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, metadata_json, height) 
+(contract_address, reward_address, developer_address, contract_rewards, inflation_rewards, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, metadata_json, height) 
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
 ON CONFLICT DO NOTHING`
 
@@ -260,12 +260,14 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 	fmt.Printf("contractRewardDistribution: %+v\n", contractRewardDistribution)
 
 	stmt := `UPDATE contract_reward SET 
-	leftover_rewards_amount = $1 
-	WHERE contract_address = $2 AND height = $3 `
+	distributed_rewards = $1, leftover_rewards = $2 
+	WHERE reward_address = $3 AND height = $4 `
 
-	_, err := db.Sql.Exec(stmt,
+	_, err := db.Sql.Exec(
+		stmt,
+		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardDistribution.DistributedRewards)),
 		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardDistribution.LeftoverRewards)),
-		contractRewardDistribution.ContractAddress,
+		contractRewardDistribution.RewardAddress,
 		contractRewardDistribution.Height,
 	)
 	if err != nil {

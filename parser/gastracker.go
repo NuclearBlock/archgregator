@@ -20,11 +20,11 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 	// Firstly, try to catch reward calculation event
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {
 
-		var contractAddress string
+		var calculationContractAddress string
 		var gasConsumed string
 		var metadataJson []byte
-		var contractRewards, inflationRewards []types.GasTrackerReward
-		var metadataCalculationReward *types.MetadataReward
+		var calculationContractRewards, calculationInflationRewards []types.GasTrackerReward
+		var metadata *types.MetadataReward
 		//var metadata map[string]interface{}
 		var err error
 
@@ -34,24 +34,24 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 		for _, attribute := range eventAttributes {
 			switch string(attribute.Key) {
 			case "contract_address":
-				contractAddress = HandleAddress(attribute.Value)
+				calculationContractAddress = HandleAddress(attribute.Value)
 			case "gas_consumed":
 				gasConsumed, err = HandleGas(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing gas consumed (calculation event): %s", err)
 				}
 			case "contract_rewards":
-				contractRewards, err = HandleRewards(attribute.Value)
+				calculationContractRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing contract rewards (calculation event): %s", err)
 				}
 			case "inflation_rewards":
-				inflationRewards, err = HandleRewards(attribute.Value)
+				calculationInflationRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing inflation rewards (calculation event): %s", err)
 				}
 			case "metadata":
-				metadataCalculationReward, err = HandleMetadata(attribute.Value)
+				metadata, err = HandleMetadata(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while handle metadata (calculation event): %s", err)
 				}
@@ -61,22 +61,22 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 		}
 
 		// We have to decrement target block height,
-		// because reward is always processed in the next beginBlock
-		rewardCalculationHeight := height - 1
+		// because reward is always processed in the next BeginBlock
+		calculationHeight := height - 1
 
 		return db.SaveContractRewardCalculation(
 			types.NewContractRewardCalculation(
-				contractAddress,
-				metadataCalculationReward.RewardAddress,
-				metadataCalculationReward.DeveloperAddress,
+				calculationContractAddress,
+				metadata.RewardAddress,
+				metadata.DeveloperAddress,
 				gasConsumed,
-				contractRewards,
-				inflationRewards,
-				metadataCalculationReward.CollectPremium,
-				metadataCalculationReward.GasRebateToUser,
-				metadataCalculationReward.PremiumPercentageCharged,
+				calculationContractRewards,
+				calculationInflationRewards,
+				metadata.CollectPremium,
+				metadata.GasRebateToUser,
+				metadata.PremiumPercentageCharged,
 				metadataJson,
-				rewardCalculationHeight,
+				calculationHeight,
 			),
 		)
 	}
@@ -86,8 +86,8 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 	// and update db row previously added with 'ContractRewardCalculationEvent'
 	if strings.Contains(event.Type, "archway.gastracker.v1.RewardDistributionEvent") {
 
-		var contractDistributionAddress string
-		var contractDistributionRewards, leftoverRewards []types.GasTrackerReward
+		var distributionRewardAddress string
+		var distributionContractRewards, distributionLeftoverRewards []types.GasTrackerReward
 		var err error
 
 		// Get all event attributes
@@ -96,14 +96,14 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 		for _, attribute := range eventAttributes {
 			switch string(attribute.Key) {
 			case "reward_address":
-				contractDistributionAddress = HandleAddress(attribute.Value)
+				distributionRewardAddress = HandleAddress(attribute.Value)
 			case "contract_rewards":
-				contractDistributionRewards, err = HandleRewards(attribute.Value)
+				distributionContractRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing contract rewards (distribution event): %s", err)
 				}
 			case "leftover_rewards":
-				leftoverRewards, err = HandleRewards(attribute.Value)
+				distributionLeftoverRewards, err = HandleRewards(attribute.Value)
 				if err != nil {
 					return fmt.Errorf("error while parsing leftover rewards (distribution event): %s", err)
 				}
@@ -111,15 +111,15 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 		}
 
 		// We have to decrement target block height,
-		// because reward is always processed in the next beginBlock
-		rewardDistributionHeight := height - 1
+		// because reward is always processed in the next BeginBlock
+		distributionHeight := height - 1
 
 		return db.SaveContractRewardDistribution(
 			types.NewContractRewardDistribution(
-				contractDistributionAddress,
-				contractDistributionRewards,
-				leftoverRewards,
-				rewardDistributionHeight,
+				distributionRewardAddress,
+				distributionContractRewards,
+				distributionLeftoverRewards,
+				distributionHeight,
 			),
 		)
 
@@ -129,7 +129,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 }
 
 func HandleAddress(value []byte) string {
-	return string(value)
+	return strings.ReplaceAll(string(value), "\"", "")
 }
 
 func HandleGas(value []byte) (string, error) {
