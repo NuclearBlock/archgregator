@@ -175,11 +175,6 @@ func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 				return HandleMsgSetMetadata(i, tx, cosmosMsg, w.db)
 			}
 
-			// err = HandleWasmMsg(i, stdMsg, tx, w.node, w.db)
-			// if err != nil {
-			// 	w.logger.MsgError(tx, stdMsg, err)
-			// 	return fmt.Errorf("error while handling tx message: %s", err)
-			// }
 		}
 
 	}

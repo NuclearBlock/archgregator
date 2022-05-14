@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	gastrackertypes "github.com/archway-network/archway/x/gastracker/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	database "github.com/nuclearblock/archgregator/database"
 	types "github.com/nuclearblock/archgregator/types"
 	tmabcitypes "github.com/tendermint/tendermint/abci/types"
@@ -30,7 +31,18 @@ func HandleMsgSetMetadata(index int, tx *types.Tx, msg *gastrackertypes.MsgSetCo
 func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database.Database) error {
 
 	// We have to check if the current event is Gastracker module reward event
+	//evType := event.ProtoMessage()
+	evType, err := sdk.ParseTypedEvent(*event)
+	if err != nil {
+		return fmt.Errorf("error while parsing typed event to proto.message: %s", err)
+	}
+	fmt.Printf("Proto.message event=", evType.String())
 
+	switch cosmosEv := evType.(type) {
+	case *gastrackertypes.ContractRewardCalculationEvent:
+		fmt.Printf("Gastracker Proto.message event=", cosmosEv.String())
+		return nil
+	}
 	// Firstly, try to catch reward calculation event
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {
 

@@ -4,12 +4,6 @@ CREATE TYPE COIN AS
     amount TEXT
 );
 
-CREATE TYPE ACCESS_CONFIG AS
-(
-    permission  INT,
-    address     TEXT
-);
-
 CREATE TABLE block
 (
     height           BIGINT UNIQUE PRIMARY KEY,
