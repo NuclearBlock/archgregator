@@ -31,18 +31,26 @@ func HandleMsgSetMetadata(index int, tx *types.Tx, msg *gastrackertypes.MsgSetCo
 func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database.Database) error {
 
 	// We have to check if the current event is Gastracker module reward event
-	//evType := event.ProtoMessage()
-	evType, err := sdk.ParseTypedEvent(*event)
-	if err != nil {
-		return fmt.Errorf("error while parsing typed event to proto.message: %s", err)
-	}
-	fmt.Printf("Proto.message event=", evType.String())
 
-	switch cosmosEv := evType.(type) {
-	case *gastrackertypes.ContractRewardCalculationEvent:
-		fmt.Printf("Gastracker Proto.message event=", cosmosEv.String())
-		return nil
+	if strings.Contains(event.Type, "archway.gastracker.v1") {
+		typedEvent, err := sdk.ParseTypedEvent(*event)
+		if err != nil {
+			return fmt.Errorf("error while parsing typed event to proto.message: %s", err)
+		}
+		fmt.Printf("Proto.message event=", typedEvent.String())
+
+		switch gastrackerEvent := typedEvent.(type) {
+		case *gastrackertypes.ContractRewardCalculationEvent:
+			fmt.Printf("Gastracker ContractAddress = %s\n", gastrackerEvent.ContractAddress)
+			fmt.Printf("Gastracker GasConsumed = %s\n", gastrackerEvent.GasConsumed)
+			fmt.Printf("Gastracker InflationRewards = %s\n", gastrackerEvent.InflationRewards)
+			fmt.Printf("Gastracker ContractRewards[] = %s\n", gastrackerEvent.ContractRewards)
+			fmt.Printf("Gastracker Metadata = %s\n", gastrackerEvent.Metadata)
+
+			//return nil
+		}
 	}
+
 	// Firstly, try to catch reward calculation event
 	if strings.Contains(event.Type, "archway.gastracker.v1.ContractRewardCalculationEvent") {
 
