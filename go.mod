@@ -3,7 +3,7 @@ module github.com/nuclearblock/archgregator
 go 1.17
 
 require (
-	github.com/CosmWasm/wasmd v0.22.0
+	github.com/CosmWasm/wasmd v0.25.0
 	github.com/cosmos/cosmos-sdk v0.45.1
 	github.com/gogo/protobuf v1.3.3
 	github.com/lib/pq v1.10.4
@@ -25,6 +25,7 @@ require (
 	github.com/CosmWasm/wasmvm v1.0.0-beta10 // indirect
 	github.com/DataDog/zstd v1.4.5 // indirect
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
+	github.com/archway-network/archway v0.0.5 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect

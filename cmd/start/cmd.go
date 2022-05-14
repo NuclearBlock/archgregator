@@ -12,9 +12,9 @@ import (
 
 	"github.com/nuclearblock/archgregator/logging"
 
-	"github.com/nuclearblock/archgregator/types/config"
 	"github.com/nuclearblock/archgregator/parser"
 	"github.com/nuclearblock/archgregator/types"
+	"github.com/nuclearblock/archgregator/types/config"
 
 	"github.com/spf13/cobra"
 )
@@ -99,18 +99,6 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, ctx *parser.Context) {
 
 	if cfg.FastSync {
 		ctx.Logger.Info("fast sync is enabled, ignoring all previous blocks", "latest_block_height", latestBlockHeight)
-		// for _, module := range ctx.Modules {
-		// 	if mod, ok := module.(modules.FastSyncModule); ok {
-		// 		err = mod.DownloadState(latestBlockHeight)
-		// 		if err != nil {
-		// 			ctx.Logger.Error("error while performing fast sync",
-		// 				"err", err,
-		// 				"last_block_height", latestBlockHeight,
-		// 				"module", module.Name(),
-		// 			)
-		// 		}
-		// 	}
-		// }
 	} else {
 		ctx.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
 		for i := cfg.StartHeight; i <= latestBlockHeight; i++ {

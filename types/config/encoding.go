@@ -1,18 +1,18 @@
 package config
 
 import (
-	wasmapp "github.com/CosmWasm/wasmd/app"
+	archway "github.com/archway-network/archway/app"
 
-	"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/archway-network/archway/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 
 // MakeEncodingConfig creates an EncodingConfig to properly handle all the messages
 func MakeEncodingConfig() params.EncodingConfig {
-	encodingConfig := params.MakeTestEncodingConfig()
+	encodingConfig := params.MakeEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	wasmapp.ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	wasmapp.ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	archway.ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	archway.ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	return encodingConfig
 }
