@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/nuclearblock/archgregator/logging"
 
@@ -145,10 +146,12 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 }
 
 func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults) error {
-	for _, evr := range r.BeginBlockEvents {
-		err := HandleGasTrackerRewards(&evr, r.Height, w.db)
-		if err != nil {
-			return fmt.Errorf("error while handle gas tracker rewards: %s", err)
+	for _, event := range r.BeginBlockEvents {
+		if strings.Contains(event.Type, gastrackertypes.ModuleName) {
+			err := HandleGasTrackerRewards(&event, r.Height, w.db)
+			if err != nil {
+				return fmt.Errorf("error while handle gas tracker rewards: %s", err)
+			}
 		}
 	}
 	return nil

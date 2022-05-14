@@ -4,12 +4,13 @@ import (
 	"time"
 
 	gastrackertypes "github.com/archway-network/archway/x/gastracker/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type GasTrackerContractMetadata struct {
 	Sender          string
 	ContractAddress string
-	Metadata        *gastrackertypes.ContractInstanceMetadata
+	Metadata        gastrackertypes.ContractInstanceMetadata
 	MetadataJson    []byte
 	TxHash          string
 	SavedAt         time.Time
@@ -35,78 +36,43 @@ func NewGasTrackerContractMetadata(
 	}
 }
 
-type GasTrackerReward struct {
-	Denom  string `json:"denom"`
-	Amount string `json:"amount"`
-}
-
-type GasTrackerMetadata struct {
-	DeveloperAddress         string `json:"developer_address,omitempty"`
-	RewardAddress            string `json:"reward_address,omitempty"`
-	GasRebateToUser          bool   `json:"gas_rebate_to_user,omitempty"`
-	CollectPremium           bool   `json:"collect_premium,omitempty"`
-	PremiumPercentageCharged int64  `json:"premium_percentage_charged,string,omitempty"`
-}
-
 type ContractRewardCalculation struct {
 	ContractAddress  string
-	RewardAddress    string
-	DeveloperAddress string
-
-	GasConsumed string
-
-	ContractRewards  []GasTrackerReward
-	InflationRewards []GasTrackerReward
-
-	CollectPremium           bool
-	GasRebateToUser          bool
-	PremiumPercentageCharged int64
-
-	MetadataJson []byte
-	Height       int64
+	GasConsumed      uint64
+	ContractRewards  sdk.DecCoins
+	InflationRewards sdk.DecCoin
+	Height           int64
 }
 
 // NewContractRewardCalculation allows to easily create a new ContractRewardCalculation
 func NewContractRewardCalculation(
 	contractAddress string,
-	rewardAddress string,
-	developerAddress string,
-	gasConsumed string,
-	contractReward []GasTrackerReward,
-	inflationRewards []GasTrackerReward,
-	collectPremium bool,
-	gasRebateToUser bool,
-	premiumPercentageCharged int64,
-	metadataJson []byte,
+	gasConsumed uint64,
+	contractReward sdk.DecCoins,
+	inflationRewards sdk.DecCoin,
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
-		ContractAddress:          contractAddress,
-		RewardAddress:            rewardAddress,
-		DeveloperAddress:         developerAddress,
-		GasConsumed:              gasConsumed,
-		ContractRewards:          contractReward,
-		InflationRewards:         inflationRewards,
-		CollectPremium:           collectPremium,
-		GasRebateToUser:          gasRebateToUser,
-		PremiumPercentageCharged: premiumPercentageCharged,
-		MetadataJson:             metadataJson,
-		Height:                   height,
+		ContractAddress:  contractAddress,
+		GasConsumed:      gasConsumed,
+		ContractRewards:  contractReward,
+		InflationRewards: inflationRewards,
+		Height:           height,
 	}
 }
 
 type ContractRewardDistribution struct {
 	RewardAddress      string
-	DistributedRewards []GasTrackerReward
-	LeftoverRewards    []GasTrackerReward
+	DistributedRewards sdk.Coins
+	LeftoverRewards    sdk.DecCoin
 	Height             int64
 }
 
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
 func NewContractRewardDistribution(
 	rewardAddress string,
-	distributedRewards []GasTrackerReward,
-	leftoverRewards []GasTrackerReward,
+	distributedRewards sdk.Coins,
+	leftoverRewards sdk.DecCoin,
 	height int64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
@@ -118,22 +84,11 @@ func NewContractRewardDistribution(
 }
 
 type ContractReward struct {
-	ContractAddress  string
-	RewardAddress    string
-	DeveloperAddress string
-
-	GasConsumed int64
-
-	ContractRewards    []GasTrackerReward
-	InflationRewards   []GasTrackerReward
-	DistributedRewards []GasTrackerReward
-	LeftoverRewards    []GasTrackerReward
-
-	CollectPremium           bool
-	GasRebateToUser          bool
-	PremiumPercentageCharged int64
-
-	MetadataJson []byte
-
-	Height int64
+	ContractAddress    string
+	GasConsumed        int64
+	ContractRewards    []sdk.DecCoin
+	InflationRewards   sdk.DecCoin
+	DistributedRewards []sdk.Coin
+	LeftoverRewards    []sdk.DecCoin
+	Height             int64
 }

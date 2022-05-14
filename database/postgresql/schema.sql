@@ -77,25 +77,21 @@ CREATE TABLE contract_metadata
     height                     BIGINT  NOT NULL
 );
 CREATE INDEX contract_metadata_height_index ON contract_metadata (height);
-CREATE INDEX contract_metadata_contract_address ON contract_metadata (contract_address);
+CREATE INDEX contract_metadata_contract_address_index ON contract_metadata (contract_address);
+CREATE INDEX contract_metadata_developer_address_index ON contract_metadata (developer_address);
+CREATE INDEX contract_metadata_reward_address_index ON contract_metadata (reward_address);
 
 
 CREATE TABLE contract_reward
 (
     contract_address           TEXT    NOT NULL,
-    reward_address             TEXT    NOT NULL,
-    developer_address          TEXT    NOT NULL,
+    gas_consumed               TEXT    DEFAULT 0,
     contract_rewards           COIN[]  NOT NULL DEFAULT '{}',
     inflation_rewards          COIN[]  NOT NULL DEFAULT '{}',
     distributed_rewards        COIN[]  NOT NULL DEFAULT '{}',
     leftover_rewards           COIN[]  NOT NULL DEFAULT '{}',
-    collect_premium            BOOLEAN,
-    gas_rebate_to_user         BOOLEAN,
-    premium_percentage_charged BIGINT,
-    gas_consumed               TEXT    DEFAULT 0,
     metadata_json              JSONB   NOT NULL DEFAULT '{}'::JSONB,
     height                     BIGINT  NOT NULL
 );
+CREATE INDEX contract_reward_height_index ON contract_reward (height);
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
-CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);
-CREATE INDEX contract_reward_reward_address_index ON contract_reward (reward_address);

@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	types "github.com/nuclearblock/archgregator/types"
 )
 
 func ToString(value sql.NullString) string {
@@ -94,15 +93,6 @@ func NewDbCoins(coins sdk.Coins) DbCoins {
 		dbCoins = append(dbCoins, &DbCoin{Amount: coin.Amount.String(), Denom: coin.Denom})
 	}
 	return dbCoins
-}
-
-// NewDbCoins build a new DbCoins object starting from an array of coins
-func NewDbCoinsFromGastracker(coins []types.GasTrackerReward) DbCoins {
-	DbCoins := make([]*DbCoin, 0)
-	for _, coin := range coins {
-		DbCoins = append(DbCoins, &DbCoin{Amount: coin.Amount, Denom: coin.Denom})
-	}
-	return DbCoins
 }
 
 // Equal tells whether c and d contain the same items in the same order

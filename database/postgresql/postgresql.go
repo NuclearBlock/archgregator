@@ -2,6 +2,8 @@ package postgresql
 
 import (
 	"database/sql"
+	"strconv"
+
 	// "encoding/base64"
 	"fmt"
 
@@ -169,25 +171,16 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 
 	stmt := `
 	INSERT INTO contract_reward 
-	(contract_address, reward_address, developer_address, contract_rewards, inflation_rewards, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, metadata_json, height) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+	(contract_address, gas_consumed, contract_rewards, inflation_rewards, height) 
+	VALUES ($1, $2, $3, $4, $5) 
 	ON CONFLICT DO NOTHING`
-
-	// TO-DO: check if the below is stored as Json in DB:
-	// - Data
 
 	_, err := db.Sql.Exec(
 		stmt,
 		contractRewardCalculation.ContractAddress,
-		contractRewardCalculation.RewardAddress,
-		contractRewardCalculation.DeveloperAddress,
-		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardCalculation.ContractRewards)),
-		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardCalculation.InflationRewards)),
-		contractRewardCalculation.CollectPremium,
-		contractRewardCalculation.GasRebateToUser,
-		contractRewardCalculation.PremiumPercentageCharged,
-		string(contractRewardCalculation.GasConsumed),
-		contractRewardCalculation.MetadataJson,
+		strconv.FormatUint(contractRewardCalculation.GasConsumed, 10),
+		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.ContractRewards)),
+		pq.Array(dbtypes.NewDbDecCoin(contractRewardCalculation.InflationRewards)),
 		contractRewardCalculation.Height,
 	)
 
@@ -205,8 +198,8 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 
 	_, err := db.Sql.Exec(
 		stmt,
-		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardDistribution.DistributedRewards)),
-		pq.Array(dbtypes.NewDbCoinsFromGastracker(contractRewardDistribution.LeftoverRewards)),
+		pq.Array(dbtypes.NewDbCoins(contractRewardDistribution.DistributedRewards)),
+		pq.Array(dbtypes.NewDbDecCoin(contractRewardDistribution.LeftoverRewards)),
 		contractRewardDistribution.RewardAddress,
 		contractRewardDistribution.Height,
 	)
