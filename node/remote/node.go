@@ -25,6 +25,7 @@ import (
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
+	//sdk "github.com/cosmos/cosmos-sdk/types"
 	httpclient "github.com/tendermint/tendermint/rpc/client/http"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	jsonrpcclient "github.com/tendermint/tendermint/rpc/jsonrpc/client"
@@ -74,7 +75,7 @@ func NewNode(cfg *Details, codec codec.Codec) (*Node, error) {
 		return nil, err
 	}
 
-	wasmClient := wasmtypes.NewQueryClient(grpcConnection)
+	wasmQueryClient := wasmtypes.NewQueryClient(grpcConnection)
 
 	return &Node{
 		ctx:   context.Background(),
@@ -83,7 +84,7 @@ func NewNode(cfg *Details, codec codec.Codec) (*Node, error) {
 		client:          rpcClient,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
 		grpcConnection:  grpcConnection,
-		wasmClient:      wasmClient,
+		wasmClient:      wasmQueryClient,
 	}, nil
 }
 
@@ -253,8 +254,23 @@ func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 }
 
 // GetContractInfo implements wasmsource.Source
+func (cp *Node) GetCodeInfo(height int64, codeId uint64) (*wasmtypes.QueryCodeResponse, error) {
+	response, err := cp.wasmClient.Code(
+		GetHeightRequestContext(cp.ctx, height),
+		&wasmtypes.QueryCodeRequest{
+			CodeId: codeId,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while getting Code info: %s", err)
+	}
+
+	return response, nil
+}
+
+// GetContractInfo implements wasmsource.Source
 func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
-	res, err := cp.wasmClient.ContractInfo(
+	response, err := cp.wasmClient.ContractInfo(
 		GetHeightRequestContext(cp.ctx, height),
 		&wasmtypes.QueryContractInfoRequest{
 			Address: contractAddr,
@@ -264,7 +280,7 @@ func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.Q
 		return nil, fmt.Errorf("error while getting contract info: %s", err)
 	}
 
-	return res, nil
+	return response, nil
 }
 
 // Stop implements node.Node

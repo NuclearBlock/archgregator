@@ -3,13 +3,14 @@ package config
 import (
 	archway "github.com/archway-network/archway/app"
 
-	"github.com/archway-network/archway/app/params"
+	//"github.com/archway-network/archway/app/params"
+	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 
 // MakeEncodingConfig creates an EncodingConfig to properly handle all the messages
 func MakeEncodingConfig() params.EncodingConfig {
-	encodingConfig := params.MakeEncodingConfig()
+	encodingConfig := params.MakeTestEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	archway.ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)

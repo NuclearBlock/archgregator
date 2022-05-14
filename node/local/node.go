@@ -21,6 +21,7 @@ import (
 	tmmath "github.com/tendermint/tendermint/libs/math"
 	tmquery "github.com/tendermint/tendermint/libs/pubsub/query"
 	"github.com/tendermint/tendermint/privval"
+
 	//tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"github.com/tendermint/tendermint/proxy"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -537,27 +538,17 @@ func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 }
 
-// GetContractInfo implements node.Node
-func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
-	//ctx, err := LoadHeight(height)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error while loading height: %s", err)
-	// }
-
-	// res, err := cp.q.ContractInfo(
-	// 	sdk.WrapSDKContext(<-cp.ctx.Done()),
-	// 	&wasmtypes.QueryContractInfoRequest{
-	// 		Address: contractAddr,
-	// 	},
-	// )
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error while getting contract info: %s", err)
-	// }
-
-	//return res, nil
+// GetContractInfo implements wasmsource.Source
+func (cp *Node) GetCodeInfo(height int64, codeId uint64) (*wasmtypes.QueryCodeResponse, error) {
+	//TO-DO ...
 	return nil, nil
 }
 
+// GetContractInfo implements node.Node
+func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
+	//TO-DO ...
+	return nil, nil
+}
 
 // Stop implements node.Node
 func (cp *Node) Stop() {

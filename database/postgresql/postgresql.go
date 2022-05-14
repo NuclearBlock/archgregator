@@ -101,18 +101,14 @@ func (db *Database) SaveMessage(msg *types.Message) error {
 
 // SaveWasmCode allows to store the wasm code from MsgStoreCode
 func (db *Database) SaveWasmCode(wasmCode types.WasmCode) error {
-
 	stmt := `
-INSERT INTO wasm_code(sender, byte_code, instantiate_permission, code_id, height) 
-VALUES ($1, $2, $3, $4, $5) 
-ON CONFLICT DO NOTHING`
-
-	// TO-DO: check if string(wasmCode.WasmByteCode) saved as string in DB
+	INSERT INTO wasm_code(creator, code_hash, code_id, size, tx_hash, height) 
+	VALUES ($1, $2, $3, $4, $5, $6) 
+	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(stmt,
-		wasmCode.Sender, string(wasmCode.WasmByteCode),
-		pq.Array(dbtypes.NewDbAccessConfig(wasmCode.InstantiatePermission)),
-		wasmCode.CodeID, wasmCode.Height,
+		wasmCode.Creator, wasmCode.CodeHash,
+		wasmCode.CodeID, wasmCode.Size, wasmCode.CodeHash, wasmCode.Height,
 	)
 	if err != nil {
 		return fmt.Errorf("error while saving wasm code: %s", err)
@@ -125,25 +121,15 @@ ON CONFLICT DO NOTHING`
 func (db *Database) SaveWasmContract(wasmContract types.WasmContract) error {
 
 	stmt := `
-INSERT INTO wasm_contract 
-(sender, admin, code_id, label, raw_contract_message, funds, contract_address, data, instantiated_at, contract_info_extension, height) 
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
-ON CONFLICT DO NOTHING`
+	INSERT INTO wasm_contract 
+	(sender, creator, admin, code_id, label, raw_contract_message, funds, contract_address, tx_hash, instantiated_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+	ON CONFLICT DO NOTHING`
 
-	ExtensionBz, err := db.EncodingConfig.Marshaler.MarshalJSON(wasmContract.ContractInfoExtension)
-	if err != nil {
-		return fmt.Errorf("error while marshaling contract info extension: %s", err)
-	}
-
-	// TO-DO: check if the below is stored as Json in DB:
-	// - Data
-	// - ContractInfoExtension
-	// - RawContractMsg
-
-	_, err = db.Sql.Exec(stmt,
-		wasmContract.Sender, wasmContract.Admin, wasmContract.CodeID, wasmContract.Label, string(wasmContract.RawContractMsg),
-		pq.Array(dbtypes.NewDbCoins(wasmContract.Funds)), wasmContract.ContractAddress, wasmContract.Data,
-		wasmContract.InstantiatedAt, string(ExtensionBz), wasmContract.Height,
+	_, err := db.Sql.Exec(stmt,
+		wasmContract.Sender, wasmContract.Creator, wasmContract.Admin, wasmContract.CodeID, wasmContract.Label, string(wasmContract.RawContractMsg),
+		pq.Array(dbtypes.NewDbCoins(wasmContract.Funds)), wasmContract.ContractAddress, wasmContract.TxHash,
+		wasmContract.InstantiatedAt, wasmContract.Height,
 	)
 
 	if err != nil {
@@ -157,10 +143,10 @@ ON CONFLICT DO NOTHING`
 func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteContract) error {
 
 	stmt := `
-INSERT INTO wasm_execute_contract 
-(sender, contract_address, raw_contract_message, funds, tx_hash, executed_at, height) 
-VALUES ($1, $2, $3, $4, $5, $6, $7) 
-ON CONFLICT DO NOTHING`
+	INSERT INTO wasm_execute_contract 
+	(sender, contract_address, raw_contract_message, funds, tx_hash, executed_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7) 
+	ON CONFLICT DO NOTHING`
 
 	// TO-DO: check if the below is stored as Json in DB:
 	// - Data
@@ -182,54 +168,13 @@ ON CONFLICT DO NOTHING`
 	return nil
 }
 
-func (db *Database) UpdateContractWithMsgMigrateContract(
-	sender string,
-	contractAddress string,
-	codeID uint64,
-	rawContractMsg []byte,
-	data string,
-) error {
-
-	stmt := `UPDATE wasm_contract SET 
-sender = $1, code_id = $2, raw_contract_message = $3, data = $4 
-WHERE contract_address = $5 `
-
-	// TO-DO: check if the below is stored as Json in DB:
-	// - rawContractMsg
-	// - Data
-
-	_, err := db.Sql.Exec(stmt,
-		sender, codeID, string(rawContractMsg), data,
-		contractAddress,
-	)
-	if err != nil {
-		return fmt.Errorf("error while updating wasm contract from contract migration: %s", err)
-
-	}
-	return nil
-}
-
-func (db *Database) UpdateContractAdmin(sender string, contractAddress string, newAdmin string) error {
-
-	stmt := `UPDATE wasm_contract SET 
-sender = $1, admin = $2 WHERE contract_address = $2 `
-
-	_, err := db.Sql.Exec(stmt, sender, newAdmin, contractAddress)
-	if err != nil {
-		return fmt.Errorf("error while updating wsm contract admin: %s", err)
-	}
-	return nil
-}
-
 func (db *Database) SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error {
 
-	fmt.Printf("contractRewardCalculation: %+v\n", contractRewardCalculation)
-
 	stmt := `
-INSERT INTO contract_reward 
-(contract_address, reward_address, developer_address, contract_rewards, inflation_rewards, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, metadata_json, height) 
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
-ON CONFLICT DO NOTHING`
+	INSERT INTO contract_reward 
+	(contract_address, reward_address, developer_address, contract_rewards, inflation_rewards, collect_premium, gas_rebate_to_user, premium_percentage_charged, gas_consumed, metadata_json, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+	ON CONFLICT DO NOTHING`
 
 	// TO-DO: check if the below is stored as Json in DB:
 	// - Data
@@ -257,8 +202,6 @@ ON CONFLICT DO NOTHING`
 
 func (db *Database) SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error {
 
-	fmt.Printf("contractRewardDistribution: %+v\n", contractRewardDistribution)
-
 	stmt := `UPDATE contract_reward SET 
 	distributed_rewards = $1, leftover_rewards = $2 
 	WHERE reward_address = $3 AND height = $4 `
@@ -272,6 +215,32 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 	)
 	if err != nil {
 		return fmt.Errorf("error while saving contract distribution rewards: %s", err)
+	}
+	return nil
+}
+
+func (db *Database) SaveGasTrackerContractMetadata(gastrackerContractMetadata types.GasTrackerContractMetadata) error {
+	fmt.Printf("gastrackerContractMetadata=: %+v\n", gastrackerContractMetadata)
+
+	stmt := `(contract_address, reward_address, developer_address, collect_premium, gas_rebate_to_user, premium_percentage_charged, metadata_json, tx_hash, saved_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+	ON CONFLICT DO NOTHING`
+
+	_, err := db.Sql.Exec(
+		stmt,
+		gastrackerContractMetadata.ContractAddress,
+		gastrackerContractMetadata.Metadata.RewardAddress,
+		gastrackerContractMetadata.Metadata.DeveloperAddress,
+		gastrackerContractMetadata.Metadata.CollectPremium,
+		gastrackerContractMetadata.Metadata.GasRebateToUser,
+		gastrackerContractMetadata.Metadata.PremiumPercentageCharged,
+		gastrackerContractMetadata.MetadataJson,
+		gastrackerContractMetadata.SavedAt,
+		gastrackerContractMetadata.TxHash,
+		gastrackerContractMetadata.Height,
+	)
+	if err != nil {
+		return fmt.Errorf("error while saving contract metadata: %s", err)
 	}
 	return nil
 }

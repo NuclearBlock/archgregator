@@ -16,6 +16,9 @@ type DbAccessConfig struct {
 
 // NewDbAccessConfig builds a DbAccessConfig starting from an CosmWasm type AccessConfig
 func NewDbAccessConfig(accessCfg *wasmtypes.AccessConfig) DbAccessConfig {
+	if accessCfg == nil {
+		return DbAccessConfig{}
+	}
 	return DbAccessConfig{
 		Permission: int(accessCfg.Permission),
 		Address:    accessCfg.Address,

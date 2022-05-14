@@ -11,8 +11,9 @@ import (
 	"github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/types/config"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	gastrackertypes "github.com/archway-network/archway/x/gastracker/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	tmabcitypes "github.com/tendermint/tendermint/abci/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
@@ -127,19 +128,35 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 	// Save block to database
 	err := w.db.SaveBlock(types.NewBlockFromTmBlock(b, sumGasTxs(txs)))
 	if err != nil {
-		return fmt.Errorf("failed to persist block: %s", err)
+		return fmt.Errorf("failed to save block: %s", err)
 	}
 
+	err = w.ProcessEvents(r)
+	if err != nil {
+		return fmt.Errorf("failed to process events: %s", err)
+	}
+
+	err = w.ProcessTransactions(txs)
+	if err != nil {
+		return fmt.Errorf("failed to process transactions: %s", err)
+	}
+
+	return nil
+}
+
+func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults) error {
+	for _, evr := range r.BeginBlockEvents {
+		err := HandleGasTrackerRewards(&evr, r.Height, w.db)
+		if err != nil {
+			return fmt.Errorf("error while handle gas tracker rewards: %s", err)
+		}
+	}
+	return nil
+}
+
+func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 	// Handle all the transactions inside the block
 	for _, tx := range txs {
-		// Handle all the events contained inside the transaction
-
-		// for _, txEvent := range tx.Events {
-		// 	if strings.Contains(txEvent.Type, "wasm") {
-		// 		HandleWasmEvent(&txEvent, tx)
-		// 	}
-		// }
-
 		for i, msg := range tx.Body.Messages {
 			var stdMsg sdk.Msg
 			err := w.codec.UnpackAny(msg, &stdMsg)
@@ -147,32 +164,24 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
 
-			err = HandleWasmMsg(i, stdMsg, tx, w.node, w.db)
-			if err != nil {
-				w.logger.MsgError(tx, stdMsg, err)
-				return fmt.Errorf("error while handling tx message: %s", err)
+			switch cosmosMsg := stdMsg.(type) {
+			case *wasmtypes.MsgStoreCode:
+				return HandleMsgStoreCode(i, tx, cosmosMsg, w.node, w.db)
+			case *wasmtypes.MsgInstantiateContract:
+				return HandleMsgInstantiateContract(i, tx, cosmosMsg, w.node, w.db)
+			case *wasmtypes.MsgExecuteContract:
+				return HandleMsgExecuteContract(i, tx, cosmosMsg, w.db)
+			case *gastrackertypes.MsgSetContractMetadata:
+				return HandleMsgSetMetadata(i, tx, cosmosMsg, w.db)
 			}
+
+			// err = HandleWasmMsg(i, stdMsg, tx, w.node, w.db)
+			// if err != nil {
+			// 	w.logger.MsgError(tx, stdMsg, err)
+			// 	return fmt.Errorf("error while handling tx message: %s", err)
+			// }
 		}
 
-	}
-
-	return w.ExportEvents(r)
-}
-
-func (w Worker) ProcessContractRewardEvent(evr *tmabcitypes.Event) error {
-	// TO-DO ...
-	return nil
-}
-
-func (w Worker) ExportEvents(r *tmctypes.ResultBlockResults) error {
-	for _, evr := range r.BeginBlockEvents {
-		err := HandleReward(&evr, r.Height, w.db)
-		if err != nil {
-			return fmt.Errorf("error while unpacking message: %s", err)
-		}
-		// for _, evAttr := range evr.Attributes {
-		// 	fmt.Println(evAttr.String())
-		// }
 	}
 	return nil
 }

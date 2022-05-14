@@ -26,10 +26,11 @@ CREATE INDEX block_proposer_address_index ON block (proposer_address);
 
 CREATE TABLE wasm_code
 (
-    sender                  TEXT            NOT NULL,
-    byte_code               TEXT            NOT NULL,
-    instantiate_permission  ACCESS_CONFIG   NULL,
+    creator                 TEXT            NOT NULL,
+    code_hash               TEXT            NOT NULL,
     code_id                 BIGINT          NOT NULL UNIQUE,
+    size                    INT             NOT NULL,
+    tx_hash                 TEXT            NOT NULL,
     height                  BIGINT          NOT NULL
 );
 CREATE INDEX wasm_code_height_index ON wasm_code (height);
@@ -45,9 +46,8 @@ CREATE TABLE wasm_contract
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     funds                   COIN[]          NOT NULL DEFAULT '{}',
     contract_address        TEXT            NOT NULL UNIQUE,
-    data                    JSONB           NOT NULL DEFAULT '{}'::JSONB,
+    tx_hash                 TEXT            NOT NULL,
     instantiated_at         TIMESTAMP       NOT NULL,
-    contract_info_extension JSONB           NOT NULL DEFAULT '{}'::JSONB,
     height                  BIGINT          NOT NULL
 );
 CREATE INDEX wasm_contract_height_index ON wasm_contract (height);
@@ -67,6 +67,23 @@ CREATE TABLE wasm_execute_contract
 );
 CREATE INDEX execute_contract_height_index ON wasm_execute_contract (height);
 CREATE INDEX execute_contract_contract_address ON wasm_execute_contract (contract_address);
+
+
+CREATE TABLE contract_metadata
+(
+    contract_address           TEXT    NOT NULL,
+    reward_address             TEXT    NOT NULL,
+    developer_address          TEXT    NOT NULL,
+    collect_premium            BOOLEAN,
+    gas_rebate_to_user         BOOLEAN,
+    premium_percentage_charged BIGINT,
+    metadata_json              JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    tx_hash                    TEXT    NOT NULL,              
+    saved_at                   TIMESTAMP  NOT NULL,
+    height                     BIGINT  NOT NULL
+);
+CREATE INDEX contract_metadata_height_index ON contract_metadata (height);
+CREATE INDEX contract_metadata_contract_address ON contract_metadata (contract_address);
 
 
 CREATE TABLE contract_reward

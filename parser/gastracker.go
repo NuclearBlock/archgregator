@@ -4,16 +4,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"time"
 
 	"strings"
 
+	gastrackertypes "github.com/archway-network/archway/x/gastracker/types"
 	database "github.com/nuclearblock/archgregator/database"
 	types "github.com/nuclearblock/archgregator/types"
 	tmabcitypes "github.com/tendermint/tendermint/abci/types"
 )
 
+// HandleMsgSetMetadata allows to properly handle a Gastracker MsgSetMetadata
+func HandleMsgSetMetadata(index int, tx *types.Tx, msg *gastrackertypes.MsgSetContractMetadata, db database.Database) error {
+	timestamp, err := time.Parse(time.RFC3339, tx.Timestamp)
+	if err != nil {
+		return fmt.Errorf("error while parsing time: %s", err)
+	}
+
+	return db.SaveGasTrackerContractMetadata(
+		types.NewGasTrackerContractMetadata(msg, tx.TxHash, timestamp, tx.Height),
+	)
+}
+
 // NewContractReward allows to build a new smart contract reward instance from archway.gastracker event
-func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) error {
+func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database.Database) error {
 
 	// We have to check if the current event is Gastracker module reward event
 
@@ -24,7 +38,7 @@ func HandleReward(event *tmabcitypes.Event, height int64, db database.Database) 
 		var gasConsumed string
 		var metadataJson []byte
 		var calculationContractRewards, calculationInflationRewards []types.GasTrackerReward
-		var metadata *types.MetadataReward
+		var metadata *types.GasTrackerMetadata
 		//var metadata map[string]interface{}
 		var err error
 
@@ -167,8 +181,8 @@ func HandleRewards(value []byte) ([]types.GasTrackerReward, error) {
 	return Coins, nil
 }
 
-func HandleMetadata(value []byte) (*types.MetadataReward, error) {
-	var metadata types.MetadataReward
+func HandleMetadata(value []byte) (*types.GasTrackerMetadata, error) {
+	var metadata types.GasTrackerMetadata
 	err := json.Unmarshal(value, &metadata)
 	fmt.Print(err)
 	if err != nil {

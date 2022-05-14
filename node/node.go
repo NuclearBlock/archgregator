@@ -57,6 +57,8 @@ type Node interface {
 	// the context and handle any errors appropriately.
 	SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error)
 
+	GetCodeInfo(height int64, codeId uint64) (*wasmtypes.QueryCodeResponse, error)
+
 	GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error)
 
 	// Stop defers the node stop execution to the client.

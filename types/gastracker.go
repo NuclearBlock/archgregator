@@ -1,11 +1,44 @@
 package types
 
+import (
+	"time"
+
+	gastrackertypes "github.com/archway-network/archway/x/gastracker/types"
+)
+
+type GasTrackerContractMetadata struct {
+	Sender          string
+	ContractAddress string
+	Metadata        *gastrackertypes.ContractInstanceMetadata
+	MetadataJson    []byte
+	TxHash          string
+	SavedAt         time.Time
+	Height          int64
+}
+
+func NewGasTrackerContractMetadata(
+	msg *gastrackertypes.MsgSetContractMetadata,
+	txHash string,
+	savedAt time.Time,
+	height int64,
+) GasTrackerContractMetadata {
+	return GasTrackerContractMetadata{
+		Sender:          msg.Sender,
+		ContractAddress: msg.ContractAddress,
+		Metadata:        msg.Metadata,
+		MetadataJson:    []byte(msg.Metadata.String()),
+		TxHash:          txHash,
+		SavedAt:         savedAt,
+		Height:          height,
+	}
+}
+
 type GasTrackerReward struct {
 	Denom  string `json:"denom"`
 	Amount string `json:"amount"`
 }
 
-type MetadataReward struct {
+type GasTrackerMetadata struct {
 	DeveloperAddress         string `json:"developer_address,omitempty"`
 	RewardAddress            string `json:"reward_address,omitempty"`
 	GasRebateToUser          bool   `json:"gas_rebate_to_user,omitempty"`

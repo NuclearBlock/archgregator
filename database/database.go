@@ -32,11 +32,11 @@ type Database interface {
 	SaveWasmCode(wasmCode types.WasmCode) error
 	SaveWasmContract(wasmContract types.WasmContract) error
 	SaveWasmExecuteContract(executeContract types.WasmExecuteContract) error
-	UpdateContractWithMsgMigrateContract(sender string, contractAddress string, codeID uint64, rawContractMsg []byte, data string) error
-	UpdateContractAdmin(sender string, contractAddress string, newAdmin string) error
 
 	SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error
 	SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error
+
+	SaveGasTrackerContractMetadata(gastrackerContractMetadata types.GasTrackerContractMetadata) error
 
 	// Close closes the connection to the database
 	Close()
