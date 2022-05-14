@@ -22,11 +22,13 @@ func NewGasTrackerContractMetadata(
 	savedAt time.Time,
 	height int64,
 ) GasTrackerContractMetadata {
+	metadataJson := []byte("{}")
+
 	return GasTrackerContractMetadata{
 		Sender:          msg.Sender,
 		ContractAddress: msg.ContractAddress,
 		Metadata:        msg.Metadata,
-		MetadataJson:    []byte(msg.Metadata.String()),
+		MetadataJson:    metadataJson,
 		TxHash:          txHash,
 		SavedAt:         savedAt,
 		Height:          height,

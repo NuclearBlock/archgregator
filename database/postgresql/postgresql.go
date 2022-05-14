@@ -148,9 +148,6 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 	VALUES ($1, $2, $3, $4, $5, $6, $7) 
 	ON CONFLICT DO NOTHING`
 
-	// TO-DO: check if the below is stored as Json in DB:
-	// - Data
-
 	_, err := db.Sql.Exec(stmt,
 		executeContract.Sender,
 		executeContract.ContractAddress,
@@ -222,7 +219,8 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 func (db *Database) SaveGasTrackerContractMetadata(gastrackerContractMetadata types.GasTrackerContractMetadata) error {
 	fmt.Printf("gastrackerContractMetadata=: %+v\n", gastrackerContractMetadata)
 
-	stmt := `(contract_address, reward_address, developer_address, collect_premium, gas_rebate_to_user, premium_percentage_charged, metadata_json, tx_hash, saved_at, height) 
+	stmt := `INSERT INTO contract_metadata 
+	(contract_address, reward_address, developer_address, collect_premium, gas_rebate_to_user, premium_percentage_charged, metadata_json, tx_hash, saved_at, height) 
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
 	ON CONFLICT DO NOTHING`
 
@@ -235,8 +233,8 @@ func (db *Database) SaveGasTrackerContractMetadata(gastrackerContractMetadata ty
 		gastrackerContractMetadata.Metadata.GasRebateToUser,
 		gastrackerContractMetadata.Metadata.PremiumPercentageCharged,
 		gastrackerContractMetadata.MetadataJson,
-		gastrackerContractMetadata.SavedAt,
 		gastrackerContractMetadata.TxHash,
+		gastrackerContractMetadata.SavedAt,
 		gastrackerContractMetadata.Height,
 	)
 	if err != nil {
