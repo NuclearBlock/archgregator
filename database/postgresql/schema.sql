@@ -87,13 +87,15 @@ CREATE TABLE contract_reward
     reward_address             TEXT    NOT NULL,
     developer_address          TEXT    NOT NULL,
     gas_consumed               TEXT    DEFAULT 0,
-    contract_rewards           COIN[]  NOT NULL DEFAULT '{}',
-    inflation_rewards          COIN[]  NOT NULL DEFAULT '{}',
-    distributed_rewards        COIN[]  NOT NULL DEFAULT '{}',
-    leftover_rewards           COIN[]  NOT NULL DEFAULT '{}',
+    contract_rewards_denom     TEXT    NOT NULL,
+    contract_rewards_amoubt    DOUBLE  PRECISION NOT NULL DEFAULT 0,
+    inflation_rewards_amount   DOUBLE  PRECISION NOT NULL DEFAULT 0,
+    distributed_rewards_amount DOUBLE  PRECISION NOT NULL DEFAULT 0,
+    leftover_rewards_amount    DOUBLE  PRECISION NOT NULL DEFAULT 0,
     gas_rebate_to_user         BOOLEAN,
     collect_premium            BOOLEAN,
     premium_percentage_charged BIGINT,
+    reward_date                TIMESTAMP  NOT NULL,
     height                     BIGINT  NOT NULL
 );
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);

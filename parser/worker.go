@@ -132,8 +132,11 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 		return fmt.Errorf("failed to save block: %s", err)
 	}
 
+	// Get block date for gastracker rewards usage
+	timeStampBlock := txs[0].Timestamp
+
 	// Process block events to fing gastracker rewards
-	err = w.ProcessEvents(r)
+	err = w.ProcessEvents(r, timeStampBlock)
 	if err != nil {
 		return fmt.Errorf("failed to process events: %s", err)
 	}
@@ -149,11 +152,11 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 
 // ProcessEvents accepts a set of events of current BeginBlock
 // Events will be processed to catch gastracker rewards
-func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults) error {
+func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults, ts string) error {
 	for _, event := range r.BeginBlockEvents {
 		// Only 'gastracker' events
 		if strings.Contains(event.Type, gastrackertypes.ModuleName) {
-			err := HandleGasTrackerRewards(&event, r.Height, w.db)
+			err := HandleGasTrackerRewards(&event, r.Height, ts, w.db)
 			if err != nil {
 				return fmt.Errorf("error while handle gas tracker rewards: %s", err)
 			}

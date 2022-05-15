@@ -24,7 +24,7 @@ func HandleMsgSetMetadata(index int, tx *types.Tx, msg *gastrackertypes.MsgSetCo
 }
 
 // HandleGasTrackerRewards allows to build a new smart contract reward instance from gastracker event
-func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database.Database) error {
+func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, ts string, db database.Database) error {
 
 	// Try to parse acbi event
 	typedEvent, err := sdk.ParseTypedEvent(*event)
@@ -39,6 +39,11 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 		// cause reward event is always processed in the 'next' BeginBlock
 		rewardHeight := height - 1
 
+		rewardDate, err := time.Parse(time.RFC3339, ts)
+		if err != nil {
+			return fmt.Errorf("error while parsing reward date from tx: %s", err)
+		}
+
 		return db.SaveContractRewardCalculation(
 			types.NewContractRewardCalculation(
 				gastrackerEvent.ContractAddress,
@@ -50,6 +55,7 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 				gastrackerEvent.Metadata.GasRebateToUser,
 				gastrackerEvent.Metadata.CollectPremium,
 				gastrackerEvent.Metadata.PremiumPercentageCharged,
+				rewardDate,
 				rewardHeight,
 			),
 		)

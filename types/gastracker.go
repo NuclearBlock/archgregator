@@ -41,14 +41,15 @@ type ContractRewardCalculation struct {
 	DeveloperAddress string
 
 	GasConsumed      uint64
-	ContractRewards  sdk.DecCoins
-	InflationRewards sdk.DecCoins
+	ContractRewards  sdk.DecCoin
+	InflationRewards sdk.DecCoin
 
 	GasRebateToUser          bool
 	CollectPremium           bool
 	PremiumPercentageCharged uint64
 
-	Height int64
+	RewardDate time.Time
+	Height     int64
 }
 
 // NewContractRewardCalculation allows to easily create a new ContractRewardCalculation
@@ -62,6 +63,7 @@ func NewContractRewardCalculation(
 	gasRebateToUser bool,
 	collectPremium bool,
 	premiumPercentageCharged uint64,
+	rewardDate time.Time,
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
@@ -69,11 +71,12 @@ func NewContractRewardCalculation(
 		RewardAddress:            rewardAddress,
 		DeveloperAddress:         developerAddress,
 		GasConsumed:              gasConsumed,
-		ContractRewards:          sdk.NewDecCoins(*contractRewards[0]),
-		InflationRewards:         sdk.NewDecCoins(*inflationRewards),
+		ContractRewards:          *contractRewards[0],
+		InflationRewards:         *inflationRewards,
 		GasRebateToUser:          gasRebateToUser,
 		CollectPremium:           collectPremium,
 		PremiumPercentageCharged: premiumPercentageCharged,
+		RewardDate:               rewardDate,
 		Height:                   height,
 	}
 }
@@ -81,8 +84,8 @@ func NewContractRewardCalculation(
 // ContractRewardDistribution represents the Gastracker reward distribution data
 type ContractRewardDistribution struct {
 	RewardAddress      string
-	DistributedRewards sdk.Coins
-	LeftoverRewards    sdk.DecCoins
+	DistributedRewards sdk.Coin
+	LeftoverRewards    sdk.DecCoin
 	Height             int64
 }
 
@@ -95,8 +98,8 @@ func NewContractRewardDistribution(
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
 		RewardAddress:      rewardAddress,
-		DistributedRewards: sdk.NewCoins(*distributedRewards[0]),
-		LeftoverRewards:    sdk.NewDecCoins(*leftoverRewards[0]),
+		DistributedRewards: *distributedRewards[0],
+		LeftoverRewards:    *leftoverRewards[0],
 		Height:             height,
 	}
 }

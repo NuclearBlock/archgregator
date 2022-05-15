@@ -159,8 +159,8 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 
 	stmt := `
 	INSERT INTO contract_reward 
-	(contract_address, reward_address, developer_address, gas_consumed, contract_rewards, inflation_rewards, gas_rebate_to_user, collect_premium, premium_percentage_charged, height) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+	(contract_address, reward_address, developer_address, gas_consumed, contract_rewards_denom, contract_rewards_amount, inflation_rewards_amount, gas_rebate_to_user, collect_premium, premium_percentage_charged, reward_date, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
 	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(
@@ -169,11 +169,13 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 		contractRewardCalculation.RewardAddress,
 		contractRewardCalculation.DeveloperAddress,
 		strconv.FormatUint(contractRewardCalculation.GasConsumed, 10),
-		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.ContractRewards)),
-		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.InflationRewards)),
+		contractRewardCalculation.ContractRewards.Denom,
+		contractRewardCalculation.ContractRewards.Amount,
+		contractRewardCalculation.InflationRewards.Amount,
 		contractRewardCalculation.GasRebateToUser,
 		contractRewardCalculation.CollectPremium,
 		contractRewardCalculation.PremiumPercentageCharged,
+		contractRewardCalculation.RewardDate,
 		contractRewardCalculation.Height,
 	)
 
@@ -186,13 +188,13 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 func (db *Database) SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error {
 
 	stmt := `UPDATE contract_reward SET 
-	distributed_rewards = $1, leftover_rewards = $2 
+	distributed_rewards_amount = $1, leftover_rewards_amount = $2 
 	WHERE reward_address = $3 AND height = $4 `
 
 	_, err := db.Sql.Exec(
 		stmt,
-		pq.Array(dbtypes.NewDbCoins(contractRewardDistribution.DistributedRewards)),
-		pq.Array(dbtypes.NewDbDecCoins(contractRewardDistribution.LeftoverRewards)),
+		contractRewardDistribution.DistributedRewards.Amount,
+		contractRewardDistribution.LeftoverRewards.Amount,
 		contractRewardDistribution.RewardAddress,
 		contractRewardDistribution.Height,
 	)
