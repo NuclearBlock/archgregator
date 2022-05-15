@@ -96,7 +96,7 @@ func (db *Database) SaveWasmCode(wasmCode types.WasmCode) error {
 
 	_, err := db.Sql.Exec(stmt,
 		wasmCode.Creator, wasmCode.CodeHash,
-		wasmCode.CodeID, wasmCode.Size, wasmCode.CodeHash, wasmCode.Height,
+		wasmCode.CodeID, wasmCode.Size, wasmCode.TxHash, wasmCode.Height,
 	)
 	if err != nil {
 		return fmt.Errorf("error while saving wasm code: %s", err)
@@ -200,7 +200,6 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 }
 
 func (db *Database) SaveGasTrackerContractMetadata(gastrackerContractMetadata types.GasTrackerContractMetadata) error {
-	fmt.Printf("gastrackerContractMetadata=: %+v\n", gastrackerContractMetadata)
 
 	stmt := `INSERT INTO contract_metadata 
 	(contract_address, reward_address, developer_address, collect_premium, gas_rebate_to_user, premium_percentage_charged, tx_hash, saved_at, height) 

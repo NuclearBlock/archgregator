@@ -12,7 +12,6 @@ type GasTrackerContractMetadata struct {
 	Sender          string
 	ContractAddress string
 	Metadata        gastrackertypes.ContractInstanceMetadata
-	MetadataJson    []byte
 	TxHash          string
 	SavedAt         time.Time
 	Height          int64
