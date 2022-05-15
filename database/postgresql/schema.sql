@@ -85,8 +85,8 @@ CREATE INDEX contract_metadata_reward_address_index ON contract_metadata (reward
 CREATE TABLE contract_reward
 (
     contract_address           TEXT    NOT NULL,
-    contract_address           TEXT    NOT NULL,
-    contract_address           TEXT    NOT NULL,
+    reward_address             TEXT    NOT NULL,
+    developer_address          TEXT    NOT NULL,
     gas_consumed               TEXT    DEFAULT 0,
     contract_rewards           COIN[]  NOT NULL DEFAULT '{}',
     inflation_rewards          COIN[]  NOT NULL DEFAULT '{}',
