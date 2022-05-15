@@ -23,7 +23,7 @@ const (
 func newAllCmd(parseConfig *parsecmdtypes.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "all",
-		Short: "Fix missing blocks and transactions in database",
+		Short: "Fix missing blocks, messages and events in database",
 		Long: fmt.Sprintf(`Refetch all the blocks in the specified range and stores them inside the database. 
 You can specify a custom blocks range by using the %s and %s flags. 
 By default, all the blocks fetched from the node will not be stored inside the database if they are already present. 
