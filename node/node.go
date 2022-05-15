@@ -22,10 +22,6 @@ type Node interface {
 	// is returned if the query fails.
 	LatestHeight() (int64, error)
 
-	// Validators returns all the known Tendermint validators for a given block
-	// height. An error is returned if the query fails.
-	Validators(height int64) (*tmctypes.ResultValidators, error)
-
 	// Block queries for a block by height. An error is returned if the query fails.
 	Block(height int64) (*tmctypes.ResultBlock, error)
 
@@ -57,8 +53,10 @@ type Node interface {
 	// the context and handle any errors appropriately.
 	SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error)
 
+	// GetCodeInfo helps to get code data
 	GetCodeInfo(height int64, codeId uint64) (*wasmtypes.QueryCodeResponse, error)
 
+	// GetCodeInfo helps to get contract instance data
 	GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error)
 
 	// Stop defers the node stop execution to the client.

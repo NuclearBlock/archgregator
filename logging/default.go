@@ -84,7 +84,6 @@ func (d *defaultLogger) GenesisError(err error) {
 func (d *defaultLogger) BlockError(block *tmctypes.ResultBlock, err error) {
 	d.Error("error while handling block",
 		"err", err,
-		LogKeyModule,
 		LogKeyHeight,
 		block.Block.Height,
 	)
@@ -94,7 +93,6 @@ func (d *defaultLogger) BlockError(block *tmctypes.ResultBlock, err error) {
 func (d *defaultLogger) EventsError(block *tmctypes.ResultBlock, err error) {
 	d.Error("error while handling block events",
 		"err", err,
-		LogKeyModule,
 		LogKeyHeight,
 		block.Block.Height,
 	)
@@ -103,16 +101,18 @@ func (d *defaultLogger) EventsError(block *tmctypes.ResultBlock, err error) {
 // TxError implements Logger
 func (d *defaultLogger) TxError(tx *types.Tx, err error) {
 	d.Error("error while handling transaction",
-		"err", err, LogKeyModule,
-		LogKeyHeight, tx.Height,
-		LogKeyTxHash, tx.TxHash,
+		"err", err,
+		LogKeyHeight,
+		tx.Height,
+		LogKeyTxHash,
+		tx.TxHash,
 	)
 }
 
 // MsgError implements Logger
 func (d *defaultLogger) MsgError(tx *types.Tx, msg sdk.Msg, err error) {
 	d.Error("error while handling message",
-		"err", err, LogKeyModule,
+		"err", err,
 		LogKeyHeight, tx.Height,
 		LogKeyTxHash, tx.TxHash,
 		LogKeyMsgType, proto.MessageName(msg),

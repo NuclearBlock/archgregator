@@ -36,7 +36,7 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 	switch gastrackerEvent := typedEvent.(type) {
 	case *gastrackertypes.ContractRewardCalculationEvent:
 		// We have to decrement target block height,
-		// because reward is always processed in the next BeginBlock
+		// because reward event is always processed in the 'next' BeginBlock
 		rewardHeight := height - 1
 
 		return db.SaveContractRewardCalculation(
@@ -56,7 +56,7 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 		// and update db row previously added with 'ContractRewardCalculationEvent'
 
 		// We have to decrement target block height,
-		// because reward is always processed in the next BeginBlock
+		// because reward event is always processed in the 'next' BeginBlock
 		// We need this fied to identify correct 'calculation' table row
 		distributionHeight := height - 1
 

@@ -118,7 +118,7 @@ func (w Worker) Process(height int64) error {
 // HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
 // in the order in which they have been registered.
 func (w Worker) HandleGenesis(genesisDoc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
-	// TO-DO ...
+	// TO-DO, Not yet implemented...
 	return nil
 }
 
@@ -132,11 +132,13 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 		return fmt.Errorf("failed to save block: %s", err)
 	}
 
+	// Process block events to fing gastracker rewards
 	err = w.ProcessEvents(r)
 	if err != nil {
 		return fmt.Errorf("failed to process events: %s", err)
 	}
 
+	// Process block transactions to find messages, that contains contracts data
 	err = w.ProcessTransactions(txs)
 	if err != nil {
 		return fmt.Errorf("failed to process transactions: %s", err)
@@ -171,16 +173,19 @@ func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 			if err != nil {
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
-			// And let's seek wasm and gastracker messages
+			// Seek wasm and gastracker messages
 			switch cosmosMsg := stdMsg.(type) {
 			case *wasmtypes.MsgStoreCode:
-				return HandleMsgStoreCode(i, tx, cosmosMsg, w.node, w.db)
+				// Wasm code store
+				return HandleMsgStoreCode(i, tx, w.node, w.db)
 			case *wasmtypes.MsgInstantiateContract:
+				// Wasm contract instantiate
 				return HandleMsgInstantiateContract(i, tx, cosmosMsg, w.node, w.db)
 			case *wasmtypes.MsgExecuteContract:
+				// Wasm contract execute
 				return HandleMsgExecuteContract(i, tx, cosmosMsg, w.db)
 			case *gastrackertypes.MsgSetContractMetadata:
-				// This is Gastracker setting metadata message
+				// Gastracker metadata set
 				return HandleMsgSetMetadata(i, tx, cosmosMsg, w.db)
 			}
 		}

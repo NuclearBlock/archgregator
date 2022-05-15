@@ -163,30 +163,6 @@ func (cp *Node) LatestHeight() (int64, error) {
 	return height, nil
 }
 
-// Validators implements node.Node
-func (cp *Node) Validators(height int64) (*tmctypes.ResultValidators, error) {
-	vals := &tmctypes.ResultValidators{
-		BlockHeight: height,
-	}
-
-	page := 1
-	perPage := 100 // maximum 100 entries per page
-	stop := false
-	for !stop {
-		result, err := cp.client.Validators(cp.ctx, &height, &page, &perPage)
-		if err != nil {
-			return nil, err
-		}
-		vals.Validators = append(vals.Validators, result.Validators...)
-		vals.Count += result.Count
-		vals.Total = result.Total
-		page += 1
-		stop = vals.Count == vals.Total
-	}
-
-	return vals, nil
-}
-
 // Block implements node.Node
 func (cp *Node) Block(height int64) (*tmctypes.ResultBlock, error) {
 	return cp.client.Block(cp.ctx, &height)
@@ -203,15 +179,6 @@ func (cp *Node) Tx(hash string) (*types.Tx, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// // Decode messages
-	// for _, msg := range res.Tx.Body.Messages {
-	// 	var stdMsg sdk.Msg
-	// 	err = cp.codec.UnpackAny(msg, &stdMsg)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("error while unpacking message: %s", err)
-	// 	}
-	// }
 
 	convTx, err := types.NewTx(res.TxResponse, res.Tx)
 	if err != nil {

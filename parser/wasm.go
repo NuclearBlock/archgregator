@@ -14,7 +14,8 @@ import (
 
 // HandleMsgStoreCode allows to properly handle a MsgStoreCode
 // The Store Code Event is to upload the contract code on the chain, where a Code ID is returned
-func HandleMsgStoreCode(index int, tx *types.Tx, msg *wasmtypes.MsgStoreCode, node node.Node, db database.Database) error {
+func HandleMsgStoreCode(index int, tx *types.Tx, node node.Node, db database.Database) error {
+
 	// Get store code event
 	event, err := tx.FindEventByType(index, wasmtypes.EventTypeStoreCode)
 	if err != nil {
@@ -32,7 +33,7 @@ func HandleMsgStoreCode(index int, tx *types.Tx, msg *wasmtypes.MsgStoreCode, no
 		return fmt.Errorf("error while parsing code id to uint64: %s", err)
 	}
 
-	// Get the contract info
+	// Get the code info
 	codeInfo, err := node.GetCodeInfo(tx.Height, codeID)
 	if err != nil {
 		return fmt.Errorf("error while getting contract info: %s", err)
@@ -64,6 +65,7 @@ func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgIns
 		return fmt.Errorf("error while getting contract info: %s", err)
 	}
 
+	// Get creator address
 	creator, err := sdk.AccAddressFromBech32(contractInfo.Creator)
 	if err != nil {
 		return fmt.Errorf("error while parsing contract creator: %s", err)

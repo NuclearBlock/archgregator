@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	LogKeyModule  = "module"
 	LogKeyHeight  = "height"
 	LogKeyTxHash  = "tx_hash"
 	LogKeyMsgType = "msg_type"
