@@ -1,8 +1,6 @@
 package config
 
 import (
-	"strings"
-
 	databaseconfig "github.com/nuclearblock/archgregator/database/config"
 	loggingconfig "github.com/nuclearblock/archgregator/logging/config"
 	nodeconfig "github.com/nuclearblock/archgregator/node/config"
@@ -28,8 +26,10 @@ type Config struct {
 // NewConfig builds a new Config instance
 func NewConfig(
 	nodeCfg nodeconfig.Config,
-	chainCfg ChainConfig, dbConfig databaseconfig.Config,
-	parserConfig parserconfig.Config, loggingConfig loggingconfig.Config,
+	chainCfg ChainConfig,
+	dbConfig databaseconfig.Config,
+	parserConfig parserconfig.Config,
+	loggingConfig loggingconfig.Config,
 ) Config {
 	return Config{
 		Node:     nodeCfg,
@@ -43,8 +43,10 @@ func NewConfig(
 func DefaultConfig() Config {
 	return NewConfig(
 		nodeconfig.DefaultConfig(),
-		DefaultChainConfig(), databaseconfig.DefaultDatabaseConfig(),
-		parserconfig.DefaultParsingConfig(), loggingconfig.DefaultLoggingConfig(),
+		DefaultChainConfig(),
+		databaseconfig.DefaultDatabaseConfig(),
+		parserconfig.DefaultParsingConfig(),
+		loggingconfig.DefaultLoggingConfig(),
 	)
 }
 
@@ -56,28 +58,17 @@ func (c Config) GetBytes() ([]byte, error) {
 
 type ChainConfig struct {
 	Bech32Prefix string   `yaml:"bech32_prefix"`
-	Modules      []string `yaml:"modules"`
 }
 
 // NewChainConfig returns a new ChainConfig instance
-func NewChainConfig(bech32Prefix string, modules []string) ChainConfig {
+func NewChainConfig(bech32Prefix string) ChainConfig {
 	return ChainConfig{
 		Bech32Prefix: bech32Prefix,
-		Modules:      modules,
 	}
 }
 
 // DefaultChainConfig returns the default instance of ChainConfig
 func DefaultChainConfig() ChainConfig {
-	return NewChainConfig("cosmos", nil)
+	return NewChainConfig("archway")
 }
 
-func (cfg ChainConfig) IsModuleEnabled(moduleName string) bool {
-	for _, module := range cfg.Modules {
-		if strings.EqualFold(module, moduleName) {
-			return true
-		}
-	}
-
-	return false
-}

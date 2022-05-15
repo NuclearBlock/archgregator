@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// GasTrackerContractMetadata represents the Gastracker contract Metadata
 type GasTrackerContractMetadata struct {
 	Sender          string
 	ContractAddress string
@@ -17,6 +18,7 @@ type GasTrackerContractMetadata struct {
 	Height          int64
 }
 
+// NewGasTrackerContractMetadata allows to easily create a new GasTrackerContractMetadata
 func NewGasTrackerContractMetadata(
 	msg *gastrackertypes.MsgSetContractMetadata,
 	txHash string,
@@ -36,6 +38,7 @@ func NewGasTrackerContractMetadata(
 	}
 }
 
+// ContractRewardCalculation represents the Gastracker reward calculation data
 type ContractRewardCalculation struct {
 	ContractAddress  string
 	RewardAddress    string
@@ -67,6 +70,7 @@ func NewContractRewardCalculation(
 	}
 }
 
+// ContractRewardDistribution represents the Gastracker reward distribution data
 type ContractRewardDistribution struct {
 	RewardAddress      string
 	DistributedRewards sdk.Coins
@@ -88,13 +92,3 @@ func NewContractRewardDistribution(
 		Height:             height,
 	}
 }
-
-// type ContractReward struct {
-// 	ContractAddress    string
-// 	GasConsumed        int64
-// 	ContractRewards    []*sdk.DecCoin
-// 	InflationRewards   *sdk.DecCoin
-// 	DistributedRewards []*sdk.Coin
-// 	LeftoverRewards    []*sdk.DecCoin
-// 	Height             int64
-// }
