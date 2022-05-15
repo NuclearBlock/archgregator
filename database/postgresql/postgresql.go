@@ -180,7 +180,7 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 		contractRewardCalculation.ContractAddress,
 		strconv.FormatUint(contractRewardCalculation.GasConsumed, 10),
 		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.ContractRewards)),
-		pq.Array(dbtypes.NewDbDecCoin(contractRewardCalculation.InflationRewards)),
+		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.InflationRewards)),
 		contractRewardCalculation.Height,
 	)
 
@@ -199,7 +199,7 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 	_, err := db.Sql.Exec(
 		stmt,
 		pq.Array(dbtypes.NewDbCoins(contractRewardDistribution.DistributedRewards)),
-		pq.Array(dbtypes.NewDbDecCoin(contractRewardDistribution.LeftoverRewards)),
+		pq.Array(dbtypes.NewDbDecCoins(contractRewardDistribution.LeftoverRewards)),
 		contractRewardDistribution.RewardAddress,
 		contractRewardDistribution.Height,
 	)

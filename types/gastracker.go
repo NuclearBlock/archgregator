@@ -23,7 +23,7 @@ func NewGasTrackerContractMetadata(
 	savedAt time.Time,
 	height int64,
 ) GasTrackerContractMetadata {
-	metadataJson := []byte("{}")
+	metadataJson := []byte("{}") // TO-DO
 
 	return GasTrackerContractMetadata{
 		Sender:          msg.Sender,
@@ -40,7 +40,7 @@ type ContractRewardCalculation struct {
 	ContractAddress  string
 	GasConsumed      uint64
 	ContractRewards  sdk.DecCoins
-	InflationRewards sdk.DecCoin
+	InflationRewards sdk.DecCoins
 	Height           int64
 }
 
@@ -48,15 +48,15 @@ type ContractRewardCalculation struct {
 func NewContractRewardCalculation(
 	contractAddress string,
 	gasConsumed uint64,
-	contractReward *sdk.DecCoins,
+	contractRewards []*sdk.DecCoin,
 	inflationRewards *sdk.DecCoin,
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
 		ContractAddress:  contractAddress,
 		GasConsumed:      gasConsumed,
-		ContractRewards:  *contractReward,
-		InflationRewards: *inflationRewards,
+		ContractRewards:  sdk.NewDecCoins(*contractRewards[0]),
+		InflationRewards: sdk.NewDecCoins(*inflationRewards),
 		Height:           height,
 	}
 }
@@ -64,21 +64,21 @@ func NewContractRewardCalculation(
 type ContractRewardDistribution struct {
 	RewardAddress      string
 	DistributedRewards sdk.Coins
-	LeftoverRewards    sdk.DecCoin
+	LeftoverRewards    sdk.DecCoins
 	Height             int64
 }
 
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
 func NewContractRewardDistribution(
 	rewardAddress string,
-	distributedRewards *sdk.Coins,
-	leftoverRewards *sdk.DecCoin,
+	distributedRewards []*sdk.Coin,
+	leftoverRewards []*sdk.DecCoin,
 	height int64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
 		RewardAddress:      rewardAddress,
-		DistributedRewards: *distributedRewards,
-		LeftoverRewards:    *leftoverRewards,
+		DistributedRewards: sdk.NewCoins(*distributedRewards[0]),
+		LeftoverRewards:    sdk.NewDecCoins(*leftoverRewards[0]),
 		Height:             height,
 	}
 }

@@ -42,6 +42,8 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 		return db.SaveContractRewardCalculation(
 			types.NewContractRewardCalculation(
 				gastrackerEvent.ContractAddress,
+				gastrackerEvent.Metadata.RewardAddress,
+				gastrackerEvent.Metadata.DeveloperAddress,
 				gastrackerEvent.GasConsumed,
 				gastrackerEvent.ContractRewards,
 				gastrackerEvent.InflationRewards,
