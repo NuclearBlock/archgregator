@@ -56,12 +56,13 @@ func NewContractRewardCalculation(
 	inflationRewards *sdk.DecCoin,
 	height int64,
 ) ContractRewardCalculation {
+	
 	return ContractRewardCalculation{
 		ContractAddress:  contractAddress,
 		RewardAddress:    rewardAddress,
 		DeveloperAddress: developerAddress,
 		GasConsumed:      gasConsumed,
-		ContractRewards:  sdk.NewDecCoins(*contractRewards[0]),
+		ContractRewards:  sdk.NewDecCoins(*contractRewards[0])
 		InflationRewards: sdk.NewDecCoins(*inflationRewards),
 		Height:           height,
 	}
