@@ -47,6 +47,9 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 				gastrackerEvent.GasConsumed,
 				gastrackerEvent.ContractRewards,
 				gastrackerEvent.InflationRewards,
+				gastrackerEvent.Metadata.CollectPremium,
+				gastrackerEvent.Metadata.GasRebateToUser,
+				gastrackerEvent.Metadata.PremiumPercentageCharged,
 				rewardHeight,
 			),
 		)
