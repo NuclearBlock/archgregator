@@ -46,7 +46,7 @@ type ContractRewardCalculation struct {
 
 	CollectPremium           bool
 	GasRebateToUser          bool
-	PremiumPercentageCharged int64
+	PremiumPercentageCharged uint64
 
 	Height int64
 }
@@ -61,7 +61,7 @@ func NewContractRewardCalculation(
 	inflationRewards *sdk.DecCoin,
 	collectPremium bool,
 	gasRebateToUser bool,
-	premiumPercentageCharged int64,
+	premiumPercentageCharged uint64,
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
