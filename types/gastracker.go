@@ -36,19 +36,19 @@ func NewGasTrackerContractMetadata(
 
 // ContractRewardCalculation represents the Gastracker reward calculation data
 type ContractRewardCalculation struct {
-	ContractAddress          string
-	RewardAddress            string
-	DeveloperAddress         string
+	ContractAddress  string
+	RewardAddress    string
+	DeveloperAddress string
 
-	GasConsumed              uint64
-	ContractRewards          sdk.DecCoins
-	InflationRewards         sdk.DecCoins
+	GasConsumed      uint64
+	ContractRewards  sdk.DecCoins
+	InflationRewards sdk.DecCoins
 
 	CollectPremium           bool
 	GasRebateToUser          bool
 	PremiumPercentageCharged int64
 
-	Height                   int64
+	Height int64
 }
 
 // NewContractRewardCalculation allows to easily create a new ContractRewardCalculation
@@ -65,13 +65,16 @@ func NewContractRewardCalculation(
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
-		ContractAddress:  contractAddress,
-		RewardAddress:    rewardAddress,
-		DeveloperAddress: developerAddress,
-		GasConsumed:      gasConsumed,
-		ContractRewards:  sdk.NewDecCoins(*contractRewards[0]),
-		InflationRewards: sdk.NewDecCoins(*inflationRewards),
-		Height:           height,
+		ContractAddress:          contractAddress,
+		RewardAddress:            rewardAddress,
+		DeveloperAddress:         developerAddress,
+		GasConsumed:              gasConsumed,
+		ContractRewards:          sdk.NewDecCoins(*contractRewards[0]),
+		InflationRewards:         sdk.NewDecCoins(*inflationRewards),
+		CollectPremium:           collectPremium,
+		GasRebateToUser:          gasRebateToUser,
+		PremiumPercentageCharged: premiumPercentageCharged,
+		Height:                   height,
 	}
 }
 
