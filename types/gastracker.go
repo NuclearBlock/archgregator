@@ -28,7 +28,7 @@ func NewGasTrackerContractMetadata(
 	return GasTrackerContractMetadata{
 		Sender:          msg.Sender,
 		ContractAddress: msg.ContractAddress,
-		Metadata:        msg.Metadata,
+		Metadata:        *msg.Metadata,
 		MetadataJson:    metadataJson,
 		TxHash:          txHash,
 		SavedAt:         savedAt,
@@ -48,15 +48,15 @@ type ContractRewardCalculation struct {
 func NewContractRewardCalculation(
 	contractAddress string,
 	gasConsumed uint64,
-	contractReward sdk.DecCoins,
-	inflationRewards sdk.DecCoin,
+	contractReward *sdk.DecCoins,
+	inflationRewards *sdk.DecCoin,
 	height int64,
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
 		ContractAddress:  contractAddress,
 		GasConsumed:      gasConsumed,
-		ContractRewards:  contractReward,
-		InflationRewards: inflationRewards,
+		ContractRewards:  *contractReward,
+		InflationRewards: *inflationRewards,
 		Height:           height,
 	}
 }
@@ -71,14 +71,14 @@ type ContractRewardDistribution struct {
 // NewContractRewardDistribution allows to easily create a new ContractRewardDistribution
 func NewContractRewardDistribution(
 	rewardAddress string,
-	distributedRewards sdk.Coins,
-	leftoverRewards sdk.DecCoin,
+	distributedRewards *sdk.Coins,
+	leftoverRewards *sdk.DecCoin,
 	height int64,
 ) ContractRewardDistribution {
 	return ContractRewardDistribution{
 		RewardAddress:      rewardAddress,
-		DistributedRewards: distributedRewards,
-		LeftoverRewards:    leftoverRewards,
+		DistributedRewards: *distributedRewards,
+		LeftoverRewards:    *leftoverRewards,
 		Height:             height,
 	}
 }
@@ -86,9 +86,9 @@ func NewContractRewardDistribution(
 type ContractReward struct {
 	ContractAddress    string
 	GasConsumed        int64
-	ContractRewards    []sdk.DecCoin
-	InflationRewards   sdk.DecCoin
-	DistributedRewards []sdk.Coin
-	LeftoverRewards    []sdk.DecCoin
+	ContractRewards    []*sdk.DecCoin
+	InflationRewards   *sdk.DecCoin
+	DistributedRewards []*sdk.Coin
+	LeftoverRewards    []*sdk.DecCoin
 	Height             int64
 }
