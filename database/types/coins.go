@@ -34,8 +34,6 @@ func RemoveEmpty(s []string) []string {
 	return r
 }
 
-// _________________________________________________________
-
 // DbCoin represents the information stored inside the database about a single coin
 type DbCoin struct {
 	Denom  string
@@ -80,8 +78,6 @@ func (coin DbCoin) ToCoin() sdk.Coin {
 	amount, _ := sdk.NewIntFromString(coin.Amount)
 	return sdk.NewCoin(coin.Denom, amount)
 }
-
-// _________________________________________________________
 
 // DbCoins represents an array of coins
 type DbCoins []*DbCoin
@@ -147,8 +143,6 @@ func (coins DbCoins) ToCoins() sdk.Coins {
 	return sdkCoins
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-
 // DbDecCoin represents the information stored inside the database about a single coin
 type DbDecCoin struct {
 	Denom  string
@@ -192,8 +186,6 @@ func (coin DbDecCoin) ToDecCoin() sdk.DecCoin {
 	amount, _ := sdk.NewDecFromStr(coin.Amount)
 	return sdk.NewDecCoinFromDec(coin.Denom, amount)
 }
-
-// _________________________________________________________
 
 // DbDecCoins represents an array of coins
 type DbDecCoins []*DbDecCoin

@@ -1,7 +1,8 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/simapp"
+	//"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/archway-network/archway/app"
 
 	"github.com/nuclearblock/archgregator/logging"
 	"github.com/nuclearblock/archgregator/types/config"
@@ -47,7 +48,7 @@ func (cfg *Config) WithEncodingConfigBuilder(b EncodingConfigBuilder) *Config {
 // GetEncodingConfigBuilder returns the encoding config builder to be used
 func (cfg *Config) GetEncodingConfigBuilder() EncodingConfigBuilder {
 	if cfg.encodingConfigBuilder == nil {
-		return simapp.MakeTestEncodingConfig
+		return app.MakeEncodingConfig
 	}
 	return cfg.encodingConfigBuilder
 }

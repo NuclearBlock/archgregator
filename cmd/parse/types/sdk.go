@@ -1,7 +1,8 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/archway-network/archway/app/params"
+	//"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/nuclearblock/archgregator/types/config"

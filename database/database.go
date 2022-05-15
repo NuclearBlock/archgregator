@@ -1,7 +1,8 @@
 package database
 
 import (
-	"github.com/cosmos/cosmos-sdk/simapp/params"
+	//"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/archway-network/archway/app/params"
 
 	"github.com/nuclearblock/archgregator/logging"
 

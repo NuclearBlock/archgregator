@@ -79,8 +79,8 @@ func (db *Database) HasBlock(height int64) (bool, error) {
 // SaveBlock implements database.Database
 func (db *Database) SaveBlock(block *types.Block) error {
 	sqlStatement := `
-INSERT INTO block (height, hash, num_txs, total_gas,, timestamp)
-VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`
+	INSERT INTO block (height, hash, num_txs, total_gas,, timestamp)
+	VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(sqlStatement,
 		block.Height, block.Hash, block.TxNum, block.TotalGas, block.Timestamp,
