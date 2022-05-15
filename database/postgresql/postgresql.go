@@ -159,8 +159,8 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 
 	stmt := `
 	INSERT INTO contract_reward 
-	(contract_address, reward_address, developer_address, gas_consumed, contract_rewards, inflation_rewards, height) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7) 
+	(contract_address, reward_address, developer_address, gas_consumed, contract_rewards, inflation_rewards, gas_rebate_to_user, collect_premium, premium_percentage_charged, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
 	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(
@@ -171,6 +171,9 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 		strconv.FormatUint(contractRewardCalculation.GasConsumed, 10),
 		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.ContractRewards)),
 		pq.Array(dbtypes.NewDbDecCoins(contractRewardCalculation.InflationRewards)),
+		contractRewardCalculation.GasRebateToUser,
+		contractRewardCalculation.CollectPremium,
+		contractRewardCalculation.PremiumPercentageCharged,
 		contractRewardCalculation.Height,
 	)
 

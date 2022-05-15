@@ -91,8 +91,8 @@ CREATE TABLE contract_reward
     inflation_rewards          COIN[]  NOT NULL DEFAULT '{}',
     distributed_rewards        COIN[]  NOT NULL DEFAULT '{}',
     leftover_rewards           COIN[]  NOT NULL DEFAULT '{}',
-    collect_premium            BOOLEAN,
     gas_rebate_to_user         BOOLEAN,
+    collect_premium            BOOLEAN,
     premium_percentage_charged BIGINT,
     metadata_json              JSONB   NOT NULL DEFAULT '{}'::JSONB,
     height                     BIGINT  NOT NULL
