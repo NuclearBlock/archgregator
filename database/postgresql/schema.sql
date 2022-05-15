@@ -95,5 +95,6 @@ CREATE TABLE contract_reward
     metadata_json              JSONB   NOT NULL DEFAULT '{}'::JSONB,
     height                     BIGINT  NOT NULL
 );
-CREATE INDEX contract_reward_height_index ON contract_reward (height);
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
+CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);
+CREATE INDEX contract_reward_reward_address_index ON contract_reward (reward_address);
