@@ -94,7 +94,6 @@ CREATE TABLE contract_reward
     gas_rebate_to_user         BOOLEAN,
     collect_premium            BOOLEAN,
     premium_percentage_charged BIGINT,
-    metadata_json              JSONB   NOT NULL DEFAULT '{}'::JSONB,
     height                     BIGINT  NOT NULL
 );
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
