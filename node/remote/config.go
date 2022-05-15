@@ -34,8 +34,6 @@ func (d *Details) Validate() error {
 	return nil
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-
 // RPCConfig contains the configuration for the RPC endpoint
 type RPCConfig struct {
 	ClientName     string `yaml:"client_name"`
@@ -56,8 +54,6 @@ func NewRPCConfig(clientName, address string, maxConnections int) *RPCConfig {
 func DefaultRPCConfig() *RPCConfig {
 	return NewRPCConfig("archgregator", "http://localhost:26657", 20)
 }
-
-// --------------------------------------------------------------------------------------------------------------------
 
 // GRPCConfig contains the configuration for the RPC endpoint
 type GRPCConfig struct {

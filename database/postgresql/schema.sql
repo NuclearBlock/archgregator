@@ -14,7 +14,6 @@ CREATE TABLE block
 );
 CREATE INDEX block_height_index ON block (height);
 CREATE INDEX block_hash_index ON block (hash);
-CREATE INDEX block_proposer_address_index ON block (proposer_address);
 
 
 CREATE TABLE wasm_code
@@ -54,6 +53,8 @@ CREATE TABLE wasm_execute_contract
     contract_address        TEXT            NOT NULL,
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     funds                   COIN[]          NOT NULL DEFAULT '{}',
+    gas_used                BIGINT          NOT NULL,
+    fees                    COIN[]          NOT NULL DEFAULT '{}',
     tx_hash                 TEXT            NOT NULL,
     executed_at             TIMESTAMP       NOT NULL,
     height                  BIGINT          NOT NULL
@@ -70,7 +71,6 @@ CREATE TABLE contract_metadata
     collect_premium            BOOLEAN,
     gas_rebate_to_user         BOOLEAN,
     premium_percentage_charged BIGINT,
-    metadata_json              JSONB   NOT NULL DEFAULT '{}'::JSONB,
     tx_hash                    TEXT    NOT NULL,              
     saved_at                   TIMESTAMP  NOT NULL,
     height                     BIGINT  NOT NULL

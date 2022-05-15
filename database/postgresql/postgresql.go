@@ -4,12 +4,10 @@ import (
 	"database/sql"
 	"strconv"
 
-	// "encoding/base64"
 	"fmt"
 
 	"github.com/nuclearblock/archgregator/logging"
 
-	//"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/archway-network/archway/app/params"
 	"github.com/lib/pq"
 
@@ -80,7 +78,7 @@ func (db *Database) HasBlock(height int64) (bool, error) {
 // SaveBlock implements database.Database
 func (db *Database) SaveBlock(block *types.Block) error {
 	sqlStatement := `
-	INSERT INTO block (height, hash, num_txs, total_gas,, timestamp)
+	INSERT INTO block (height, hash, num_txs, total_gas, timestamp)
 	VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(sqlStatement,
@@ -134,8 +132,8 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 
 	stmt := `
 	INSERT INTO wasm_execute_contract 
-	(sender, contract_address, raw_contract_message, funds, tx_hash, executed_at, height) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7) 
+	(sender, contract_address, raw_contract_message, funds, gas_used, fees, tx_hash, executed_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
 	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(stmt,
@@ -143,6 +141,8 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 		executeContract.ContractAddress,
 		executeContract.RawContractMsg,
 		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)),
+		executeContract.GasUsed,
+		pq.Array(dbtypes.NewDbCoins(executeContract.Fees)),
 		executeContract.TxHash,
 		executeContract.ExecutedAt,
 		executeContract.Height,
@@ -203,8 +203,8 @@ func (db *Database) SaveGasTrackerContractMetadata(gastrackerContractMetadata ty
 	fmt.Printf("gastrackerContractMetadata=: %+v\n", gastrackerContractMetadata)
 
 	stmt := `INSERT INTO contract_metadata 
-	(contract_address, reward_address, developer_address, collect_premium, gas_rebate_to_user, premium_percentage_charged, metadata_json, tx_hash, saved_at, height) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+	(contract_address, reward_address, developer_address, collect_premium, gas_rebate_to_user, premium_percentage_charged, tx_hash, saved_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
 	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(
@@ -215,7 +215,6 @@ func (db *Database) SaveGasTrackerContractMetadata(gastrackerContractMetadata ty
 		gastrackerContractMetadata.Metadata.CollectPremium,
 		gastrackerContractMetadata.Metadata.GasRebateToUser,
 		gastrackerContractMetadata.Metadata.PremiumPercentageCharged,
-		gastrackerContractMetadata.MetadataJson,
 		gastrackerContractMetadata.TxHash,
 		gastrackerContractMetadata.SavedAt,
 		gastrackerContractMetadata.Height,

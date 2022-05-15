@@ -1,7 +1,6 @@
 package types
 
 import (
-	//"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/archway-network/archway/app"
 
 	"github.com/nuclearblock/archgregator/logging"

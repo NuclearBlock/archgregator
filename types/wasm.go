@@ -76,6 +76,8 @@ type WasmExecuteContract struct {
 	ContractAddress string
 	RawContractMsg  []byte
 	Funds           sdk.Coins
+	GasUsed         int64
+	Fees            sdk.Coins
 	TxHash          string
 	ExecutedAt      time.Time
 	Height          int64
@@ -85,9 +87,8 @@ type WasmExecuteContract struct {
 // from wasmtypes.MsgExecuteContract
 func NewWasmExecuteContract(
 	msg *wasmtypes.MsgExecuteContract,
-	txHash string,
+	tx *Tx,
 	executedAt time.Time,
-	height int64,
 ) WasmExecuteContract {
 	rawContractMsg, _ := msg.Msg.MarshalJSON()
 
@@ -96,8 +97,10 @@ func NewWasmExecuteContract(
 		ContractAddress: msg.Contract,
 		RawContractMsg:  rawContractMsg,
 		Funds:           msg.Funds,
-		TxHash:          txHash,
+		GasUsed:         tx.GasUsed,
+		Fees:            tx.GetFee(),
+		TxHash:          tx.TxHash,
 		ExecutedAt:      executedAt,
-		Height:          height,
+		Height:          tx.Height,
 	}
 }

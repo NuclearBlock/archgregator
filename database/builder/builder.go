@@ -2,7 +2,6 @@ package builder
 
 import (
 	"github.com/nuclearblock/archgregator/database"
-
 	"github.com/nuclearblock/archgregator/database/postgresql"
 )
 

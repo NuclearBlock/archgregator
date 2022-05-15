@@ -54,10 +54,8 @@ func (c Config) GetBytes() ([]byte, error) {
 	return c.bytes, nil
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
 type ChainConfig struct {
-	Bech32Prefix string   `yaml:"bech32_prefix"`
+	Bech32Prefix string `yaml:"bech32_prefix"`
 }
 
 // NewChainConfig returns a new ChainConfig instance
@@ -71,4 +69,3 @@ func NewChainConfig(bech32Prefix string) ChainConfig {
 func DefaultChainConfig() ChainConfig {
 	return NewChainConfig("archway")
 }
-

@@ -91,6 +91,6 @@ func HandleMsgExecuteContract(index int, tx *types.Tx, msg *wasmtypes.MsgExecute
 	}
 
 	return db.SaveWasmExecuteContract(
-		types.NewWasmExecuteContract(msg, tx.TxHash, timestamp, tx.Height),
+		types.NewWasmExecuteContract(msg, tx, timestamp),
 	)
 }

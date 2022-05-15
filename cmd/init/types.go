@@ -22,8 +22,6 @@ func DefaultConfigCreator(_ *cobra.Command) WritableConfig {
 	return config.DefaultConfig()
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-
 // Config contains the configuration data for the init command
 type Config struct {
 	createConfig ConfigCreator

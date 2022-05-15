@@ -3,9 +3,7 @@ package builder
 import (
 	"fmt"
 
-	//"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/archway-network/archway/app/params"
-
 	"github.com/nuclearblock/archgregator/node"
 	nodeconfig "github.com/nuclearblock/archgregator/node/config"
 	"github.com/nuclearblock/archgregator/node/local"

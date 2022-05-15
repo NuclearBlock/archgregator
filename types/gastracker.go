@@ -21,20 +21,17 @@ type GasTrackerContractMetadata struct {
 // NewGasTrackerContractMetadata allows to easily create a new GasTrackerContractMetadata
 func NewGasTrackerContractMetadata(
 	msg *gastrackertypes.MsgSetContractMetadata,
-	txHash string,
+	tx *Tx,
 	savedAt time.Time,
-	height int64,
 ) GasTrackerContractMetadata {
-	metadataJson := []byte("{}") // TO-DO
 
 	return GasTrackerContractMetadata{
 		Sender:          msg.Sender,
 		ContractAddress: msg.ContractAddress,
 		Metadata:        *msg.Metadata,
-		MetadataJson:    metadataJson,
-		TxHash:          txHash,
+		TxHash:          tx.TxHash,
 		SavedAt:         savedAt,
-		Height:          height,
+		Height:          tx.Height,
 	}
 }
 

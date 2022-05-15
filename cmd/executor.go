@@ -24,9 +24,6 @@ var (
 // BuildDefaultExecutor allows to build an Executor containing a root command that
 // has the provided name and description and the default version and parse sub-commands implementations.
 //
-// registrar will be used to register custom modules. Be sure to provide an implementation that returns all
-// the modules that you want to use. If you don't want any custom module, use modules.EmptyRegistrar.
-//
 // setupCfg method will be used to customize the SDK configuration. If you don't want any customization
 // you can use the config.DefaultConfigSetup variable.
 //

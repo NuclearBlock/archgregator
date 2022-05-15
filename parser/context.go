@@ -2,12 +2,9 @@ package parser
 
 import (
 	"github.com/archway-network/archway/app/params"
-	//"github.com/cosmos/cosmos-sdk/simapp/params"
-
+	"github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/logging"
 	"github.com/nuclearblock/archgregator/node"
-
-	"github.com/nuclearblock/archgregator/database"
 )
 
 // Context represents the context that is shared among different workers

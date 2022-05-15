@@ -19,7 +19,7 @@ func HandleMsgSetMetadata(index int, tx *types.Tx, msg *gastrackertypes.MsgSetCo
 	}
 
 	return db.SaveGasTrackerContractMetadata(
-		types.NewGasTrackerContractMetadata(msg, tx.TxHash, timestamp, tx.Height),
+		types.NewGasTrackerContractMetadata(msg, tx, timestamp),
 	)
 }
 
@@ -35,8 +35,8 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 	// We have to check if this Revard Calculation event or Reward Distribution event
 	switch gastrackerEvent := typedEvent.(type) {
 	case *gastrackertypes.ContractRewardCalculationEvent:
-		// We have to decrement target block height,
-		// because reward event is always processed in the 'next' BeginBlock
+		// Have to decrement target block height,
+		// cause reward event is always processed in the 'next' BeginBlock
 		rewardHeight := height - 1
 
 		return db.SaveContractRewardCalculation(
@@ -51,13 +51,12 @@ func HandleGasTrackerRewards(event *tmabcitypes.Event, height int64, db database
 			),
 		)
 	case *gastrackertypes.RewardDistributionEvent:
-		// Now try to catch reward distribution event
-		// Because rewards distriburion happens in another event, we have to collect this data
+		// Catching reward distribution event
+		// Because rewards distriburion happens in another next event, we have to collect this data
 		// and update db row previously added with 'ContractRewardCalculationEvent'
 
-		// We have to decrement target block height,
-		// because reward event is always processed in the 'next' BeginBlock
-		// We need this fied to identify correct 'calculation' table row
+		// Decrement target block height,
+		// This fied needs to correct identify 'calculation' table row
 		distributionHeight := height - 1
 
 		return db.SaveContractRewardDistribution(
