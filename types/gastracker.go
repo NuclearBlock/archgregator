@@ -38,6 +38,8 @@ func NewGasTrackerContractMetadata(
 
 type ContractRewardCalculation struct {
 	ContractAddress  string
+	RewardAddress    string
+	DeveloperAddress string
 	GasConsumed      uint64
 	ContractRewards  sdk.DecCoins
 	InflationRewards sdk.DecCoins
@@ -47,6 +49,8 @@ type ContractRewardCalculation struct {
 // NewContractRewardCalculation allows to easily create a new ContractRewardCalculation
 func NewContractRewardCalculation(
 	contractAddress string,
+	rewardAddress string,
+	developerAddress string,
 	gasConsumed uint64,
 	contractRewards []*sdk.DecCoin,
 	inflationRewards *sdk.DecCoin,
@@ -54,6 +58,8 @@ func NewContractRewardCalculation(
 ) ContractRewardCalculation {
 	return ContractRewardCalculation{
 		ContractAddress:  contractAddress,
+		RewardAddress:    rewardAddress,
+		DeveloperAddress: developerAddress,
 		GasConsumed:      gasConsumed,
 		ContractRewards:  sdk.NewDecCoins(*contractRewards[0]),
 		InflationRewards: sdk.NewDecCoins(*inflationRewards),
