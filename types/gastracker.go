@@ -56,13 +56,12 @@ func NewContractRewardCalculation(
 	inflationRewards *sdk.DecCoin,
 	height int64,
 ) ContractRewardCalculation {
-	
 	return ContractRewardCalculation{
 		ContractAddress:  contractAddress,
 		RewardAddress:    rewardAddress,
 		DeveloperAddress: developerAddress,
 		GasConsumed:      gasConsumed,
-		ContractRewards:  sdk.NewDecCoins(*contractRewards[0])
+		ContractRewards:  sdk.NewDecCoins(*contractRewards[0]),
 		InflationRewards: sdk.NewDecCoins(*inflationRewards),
 		Height:           height,
 	}
@@ -90,12 +89,12 @@ func NewContractRewardDistribution(
 	}
 }
 
-type ContractReward struct {
-	ContractAddress    string
-	GasConsumed        int64
-	ContractRewards    []*sdk.DecCoin
-	InflationRewards   *sdk.DecCoin
-	DistributedRewards []*sdk.Coin
-	LeftoverRewards    []*sdk.DecCoin
-	Height             int64
-}
+// type ContractReward struct {
+// 	ContractAddress    string
+// 	GasConsumed        int64
+// 	ContractRewards    []*sdk.DecCoin
+// 	InflationRewards   *sdk.DecCoin
+// 	DistributedRewards []*sdk.Coin
+// 	LeftoverRewards    []*sdk.DecCoin
+// 	Height             int64
+// }

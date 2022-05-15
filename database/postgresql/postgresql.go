@@ -79,26 +79,13 @@ func (db *Database) HasBlock(height int64) (bool, error) {
 // SaveBlock implements database.Database
 func (db *Database) SaveBlock(block *types.Block) error {
 	sqlStatement := `
-INSERT INTO block (height, hash, num_txs, total_gas, proposer_address, timestamp)
-VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`
+INSERT INTO block (height, hash, num_txs, total_gas,, timestamp)
+VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`
 
-	proposerAddress := sql.NullString{Valid: len(block.ProposerAddress) != 0, String: block.ProposerAddress}
 	_, err := db.Sql.Exec(sqlStatement,
-		block.Height, block.Hash, block.TxNum, block.TotalGas, proposerAddress, block.Timestamp,
+		block.Height, block.Hash, block.TxNum, block.TotalGas, block.Timestamp,
 	)
 	return err
-}
-
-// SaveTx implements database.Database
-func (db *Database) SaveTx(tx *types.Tx) error {
-	//TO-DO
-	return nil
-}
-
-// SaveMessage implements database.Database
-func (db *Database) SaveMessage(msg *types.Message) error {
-	//TO-DO
-	return nil
 }
 
 // SaveWasmCode allows to store the wasm code from MsgStoreCode

@@ -145,8 +145,11 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 	return nil
 }
 
+// ProcessEvents accepts a set of events of current BeginBlock
+// Events will be processed to catch gastracker rewards
 func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults) error {
 	for _, event := range r.BeginBlockEvents {
+		// Only 'gastracker' events
 		if strings.Contains(event.Type, gastrackertypes.ModuleName) {
 			err := HandleGasTrackerRewards(&event, r.Height, w.db)
 			if err != nil {
@@ -157,6 +160,8 @@ func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults) error {
 	return nil
 }
 
+// ProcessTransactions accepts a set of transactions of current block
+// and process them to find wasm and gastracker messages.
 func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 	// Handle all the transactions inside the block
 	for _, tx := range txs {
@@ -166,7 +171,7 @@ func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 			if err != nil {
 				return fmt.Errorf("error while unpacking message: %s", err)
 			}
-
+			// And let's seek wasm and gastracker messages
 			switch cosmosMsg := stdMsg.(type) {
 			case *wasmtypes.MsgStoreCode:
 				return HandleMsgStoreCode(i, tx, cosmosMsg, w.node, w.db)
@@ -175,11 +180,10 @@ func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 			case *wasmtypes.MsgExecuteContract:
 				return HandleMsgExecuteContract(i, tx, cosmosMsg, w.db)
 			case *gastrackertypes.MsgSetContractMetadata:
+				// This is Gastracker setting metadata message
 				return HandleMsgSetMetadata(i, tx, cosmosMsg, w.db)
 			}
-
 		}
-
 	}
 	return nil
 }

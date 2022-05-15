@@ -12,25 +12,23 @@ import (
 
 // Block contains the data of a single chain block
 type Block struct {
-	Height          int64
-	Hash            string
-	TxNum           int
-	TotalGas        uint64
-	ProposerAddress string
-	Timestamp       time.Time
+	Height    int64
+	Hash      string
+	TxNum     int
+	TotalGas  uint64
+	Timestamp time.Time
 }
 
 // NewBlock allows to build a new Block instance
 func NewBlock(
-	height int64, hash string, txNum int, totalGas uint64, proposerAddress string, timestamp time.Time,
+	height int64, hash string, txNum int, totalGas uint64, timestamp time.Time,
 ) *Block {
 	return &Block{
-		Height:          height,
-		Hash:            hash,
-		TxNum:           txNum,
-		TotalGas:        totalGas,
-		ProposerAddress: proposerAddress,
-		Timestamp:       timestamp,
+		Height:    height,
+		Hash:      hash,
+		TxNum:     txNum,
+		TotalGas:  totalGas,
+		Timestamp: timestamp,
 	}
 }
 
@@ -41,12 +39,9 @@ func NewBlockFromTmBlock(blk *tmctypes.ResultBlock, totalGas uint64) *Block {
 		blk.Block.Hash().String(),
 		len(blk.Block.Txs),
 		totalGas,
-		ConvertValidatorAddressToBech32String(blk.Block.ProposerAddress),
 		blk.Block.Time,
 	)
 }
-
-// -------------------------------------------------------------------------------------------------------------------
 
 // Tx represents an already existing blockchain transaction
 type Tx struct {
@@ -90,28 +85,4 @@ func (tx Tx) FindAttributeByKey(event sdk.StringEvent, attrKey string) (string, 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {
 	return tx.TxResponse.Code == 0
-}
-
-// -------------------------------------------------------------------------------------------------------------------
-
-// Message represents the data of a single message
-type Message struct {
-	TxHash    string
-	Index     int
-	Type      string
-	Value     string
-	Addresses []string
-	Height    int64
-}
-
-// NewMessage allows to build a new Message instance
-func NewMessage(txHash string, index int, msgType string, value string, addresses []string, height int64) *Message {
-	return &Message{
-		TxHash:    txHash,
-		Index:     index,
-		Type:      msgType,
-		Value:     value,
-		Addresses: addresses,
-		Height:    height,
-	}
 }

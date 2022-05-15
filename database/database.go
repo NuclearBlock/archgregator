@@ -21,21 +21,30 @@ type Database interface {
 	// An error is returned if the operation fails.
 	SaveBlock(block *types.Block) error
 
-	// SaveTx will be called to save each transaction contained inside a block.
+	// SaveWasmCode stores a single WASM Code.
 	// An error is returned if the operation fails.
-	SaveTx(tx *types.Tx) error
-
-	// SaveMessage stores a single message.
-	// An error is returned if the operation fails.
-	SaveMessage(msg *types.Message) error
-
 	SaveWasmCode(wasmCode types.WasmCode) error
+
+	// SaveWasmContract stores an contract instance of WASM Code.
+	// An error is returned if the operation fails.
 	SaveWasmContract(wasmContract types.WasmContract) error
+
+	// SaveWasmExecuteContract stores each contract execution.
+	// An error is returned if the operation fails.
 	SaveWasmExecuteContract(executeContract types.WasmExecuteContract) error
 
+	// SaveSaveContractRewardCalculation helps add to db a gastracker reward data.
+	// When Calculation event will be processed - we can add to db initial rewards data
+	// An error is returned if the operation fails.
 	SaveContractRewardCalculation(contractRewardCalculation types.ContractRewardCalculation) error
+
+	// SaveContractRewardDistribution helps add to db row a gastracker reward data.
+	// When Distribution event will be processed - we can update db with rewards data
+	// An error is returned if the operation fails.
 	SaveContractRewardDistribution(contractRewardDistribution types.ContractRewardDistribution) error
 
+	// SaveGasTrackerContractMetadata stores each Gastracker Metadata set attempt.
+	// An error is returned if the operation fails.
 	SaveGasTrackerContractMetadata(gastrackerContractMetadata types.GasTrackerContractMetadata) error
 
 	// Close closes the connection to the database

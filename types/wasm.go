@@ -82,7 +82,7 @@ type WasmExecuteContract struct {
 }
 
 // NewWasmExecuteContract allows to build a new x/wasm execute contract instance
-//from wasmtypes.MsgExecuteContract
+// from wasmtypes.MsgExecuteContract
 func NewWasmExecuteContract(
 	msg *wasmtypes.MsgExecuteContract,
 	txHash string,
