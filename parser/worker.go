@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/nuclearblock/archgregator/logging"
 
@@ -133,7 +134,7 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 	}
 
 	// Get block date for gastracker rewards usage
-	timeStampBlock := txs[0].Timestamp
+	timeStampBlock := b.Block.Time.UTC()
 
 	// Process block events to fing gastracker rewards
 	err = w.ProcessEvents(r, timeStampBlock)
@@ -152,7 +153,7 @@ func (w Worker) ExportBlock(b *tmctypes.ResultBlock, r *tmctypes.ResultBlockResu
 
 // ProcessEvents accepts a set of events of current BeginBlock
 // Events will be processed to catch gastracker rewards
-func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults, ts string) error {
+func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults, ts time.Time) error {
 	for _, event := range r.BeginBlockEvents {
 		// Only 'gastracker' events
 		if strings.Contains(event.Type, gastrackertypes.ModuleName) {

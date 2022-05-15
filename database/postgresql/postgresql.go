@@ -132,8 +132,8 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 
 	stmt := `
 	INSERT INTO wasm_execute_contract 
-	(sender, contract_address, raw_contract_message, funds, gas_used, fees, tx_hash, executed_at, height) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+	(sender, contract_address, raw_contract_message, funds, gas_used, fees_denom, fees_amount, tx_hash, executed_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
 	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(stmt,
@@ -142,7 +142,8 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 		executeContract.RawContractMsg,
 		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)),
 		executeContract.GasUsed,
-		pq.Array(dbtypes.NewDbCoins(executeContract.Fees)),
+		executeContract.Fees[0].Denom,
+		executeContract.Fees[0].Amount.String(),
 		executeContract.TxHash,
 		executeContract.ExecutedAt,
 		executeContract.Height,
@@ -170,8 +171,8 @@ func (db *Database) SaveContractRewardCalculation(contractRewardCalculation type
 		contractRewardCalculation.DeveloperAddress,
 		strconv.FormatUint(contractRewardCalculation.GasConsumed, 10),
 		contractRewardCalculation.ContractRewards.Denom,
-		contractRewardCalculation.ContractRewards.Amount,
-		contractRewardCalculation.InflationRewards.Amount,
+		contractRewardCalculation.ContractRewards.Amount.String(),
+		contractRewardCalculation.InflationRewards.Amount.String(),
 		contractRewardCalculation.GasRebateToUser,
 		contractRewardCalculation.CollectPremium,
 		contractRewardCalculation.PremiumPercentageCharged,
@@ -193,8 +194,8 @@ func (db *Database) SaveContractRewardDistribution(contractRewardDistribution ty
 
 	_, err := db.Sql.Exec(
 		stmt,
-		contractRewardDistribution.DistributedRewards.Amount,
-		contractRewardDistribution.LeftoverRewards.Amount,
+		contractRewardDistribution.DistributedRewards.Amount.String(),
+		contractRewardDistribution.LeftoverRewards.Amount.String(),
 		contractRewardDistribution.RewardAddress,
 		contractRewardDistribution.Height,
 	)

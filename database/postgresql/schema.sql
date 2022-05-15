@@ -54,12 +54,14 @@ CREATE TABLE wasm_execute_contract
     raw_contract_message    JSONB           NOT NULL DEFAULT '{}'::JSONB,
     funds                   COIN[]          NOT NULL DEFAULT '{}',
     gas_used                BIGINT          NOT NULL,
-    fees                    COIN[]          NOT NULL DEFAULT '{}',
+    fees_denom              TEXT            NOT NULL,
+    fees_amount             DOUBLE          PRECISION NOT NULL DEFAULT 0,
     tx_hash                 TEXT            NOT NULL,
     executed_at             TIMESTAMP       NOT NULL,
     height                  BIGINT          NOT NULL
 );
 CREATE INDEX execute_contract_height_index ON wasm_execute_contract (height);
+CREATE INDEX execute_contract_executed_at_index ON wasm_execute_contract (executed_at);
 CREATE INDEX execute_contract_contract_address ON wasm_execute_contract (contract_address);
 
 
@@ -88,16 +90,17 @@ CREATE TABLE contract_reward
     developer_address          TEXT    NOT NULL,
     gas_consumed               TEXT    DEFAULT 0,
     contract_rewards_denom     TEXT    NOT NULL,
-    contract_rewards_amoubt    DOUBLE  PRECISION NOT NULL DEFAULT 0,
+    contract_rewards_amount    DOUBLE  PRECISION NOT NULL DEFAULT 0,
     inflation_rewards_amount   DOUBLE  PRECISION NOT NULL DEFAULT 0,
     distributed_rewards_amount DOUBLE  PRECISION NOT NULL DEFAULT 0,
     leftover_rewards_amount    DOUBLE  PRECISION NOT NULL DEFAULT 0,
     gas_rebate_to_user         BOOLEAN,
     collect_premium            BOOLEAN,
     premium_percentage_charged BIGINT,
-    reward_date                TIMESTAMP  NOT NULL,
+    reward_date                DATE  NOT NULL,
     height                     BIGINT  NOT NULL
 );
+CREATE INDEX contract_reward_reward_date_index ON contract_reward (reward_date);
 CREATE INDEX contract_reward_contract_address_index ON contract_reward (contract_address);
 CREATE INDEX contract_reward_developer_address_index ON contract_reward (developer_address);
 CREATE INDEX contract_reward_reward_address_index ON contract_reward (reward_address);
