@@ -6,7 +6,6 @@ import (
 	"time"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	database "github.com/nuclearblock/archgregator/database"
 	"github.com/nuclearblock/archgregator/node"
 	types "github.com/nuclearblock/archgregator/types"
@@ -65,19 +64,13 @@ func HandleMsgInstantiateContract(index int, tx *types.Tx, msg *wasmtypes.MsgIns
 		return fmt.Errorf("error while getting contract info: %s", err)
 	}
 
-	// Get creator address
-	creator, err := sdk.AccAddressFromBech32(contractInfo.Creator)
-	if err != nil {
-		return fmt.Errorf("error while parsing contract creator: %s", err)
-	}
-
 	timestamp, err := time.Parse(time.RFC3339, tx.Timestamp)
 	if err != nil {
 		return fmt.Errorf("error while parsing time: %s", err)
 	}
 
 	return db.SaveWasmContract(
-		types.NewWasmContract(msg, contractAddress, tx.TxHash, timestamp, creator.String(), tx.Height),
+		types.NewWasmContract(msg, contractAddress, tx.TxHash, timestamp, contractInfo.Creator, tx.Height),
 	)
 }
 

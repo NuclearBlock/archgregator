@@ -136,14 +136,16 @@ func (db *Database) SaveWasmExecuteContract(executeContract types.WasmExecuteCon
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
 	ON CONFLICT DO NOTHING`
 
+	denom := "utorii"
+
 	_, err := db.Sql.Exec(stmt,
 		executeContract.Sender,
 		executeContract.ContractAddress,
 		executeContract.RawContractMsg,
 		pq.Array(dbtypes.NewDbCoins(executeContract.Funds)),
 		executeContract.GasUsed,
-		executeContract.Fees[0].Denom,
-		executeContract.Fees[0].Amount.String(),
+		denom,
+		executeContract.Fees.AmountOf(denom).String(),
 		executeContract.TxHash,
 		executeContract.ExecutedAt,
 		executeContract.Height,

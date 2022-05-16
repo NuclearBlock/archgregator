@@ -61,12 +61,13 @@ func NewTx(txResponse *sdk.TxResponse, tx *tx.Tx) (*Tx, error) {
 // to find the event having the given type, and returns it.
 // If no such event is found, returns an error instead.
 func (tx Tx) FindEventByType(index int, eventType string) (sdk.StringEvent, error) {
-	for _, ev := range tx.Logs[index].Events {
-		if ev.Type == eventType {
-			return ev, nil
+	if len(tx.Logs) >= index {
+		for _, ev := range tx.Logs[index].Events {
+			if ev.Type == eventType {
+				return ev, nil
+			}
 		}
 	}
-
 	return sdk.StringEvent{}, fmt.Errorf("no %s event found inside tx with hash %s", eventType, tx.TxHash)
 }
 

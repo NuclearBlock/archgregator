@@ -7,9 +7,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
@@ -536,13 +536,13 @@ func (cp *Node) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 }
 
-// GetContractInfo implements wasmsource.Source
+// GetCodeInfo
 func (cp *Node) GetCodeInfo(height int64, codeId uint64) (*wasmtypes.QueryCodeResponse, error) {
 	//TO-DO ...
 	return nil, nil
 }
 
-// GetContractInfo implements node.Node
+// GetContractInfo
 func (cp *Node) GetContractInfo(height int64, contractAddr string) (*wasmtypes.QueryContractInfoResponse, error) {
 	//TO-DO ...
 	return nil, nil
