@@ -61,7 +61,7 @@ func NewTx(txResponse *sdk.TxResponse, tx *tx.Tx) (*Tx, error) {
 // to find the event having the given type, and returns it.
 // If no such event is found, returns an error instead.
 func (tx Tx) FindEventByType(index int, eventType string) (sdk.StringEvent, error) {
-	if len(tx.Logs) >= index {
+	if len(tx.Logs) > index {
 		for _, ev := range tx.Logs[index].Events {
 			if ev.Type == eventType {
 				return ev, nil
