@@ -14,17 +14,19 @@ type WasmCode struct {
 	CodeID   uint64
 	Size     int
 	TxHash   string
+	SavedAt  time.Time
 	Height   int64
 }
 
 // NewWasmCode allows to build a new x/wasm code instance from wasmtypes.MsgStoreCode
-func NewWasmCode(codeInfo *wasmtypes.QueryCodeResponse, txHash string, txHeight int64) WasmCode {
+func NewWasmCode(codeInfo *wasmtypes.QueryCodeResponse, txHash string, savedAt time.Time, txHeight int64) WasmCode {
 	return WasmCode{
 		Creator:  codeInfo.Creator,
 		CodeHash: codeInfo.DataHash.String(),
 		CodeID:   codeInfo.CodeID,
 		Size:     codeInfo.Size(),
 		TxHash:   txHash,
+		SavedAt:  savedAt,
 		Height:   txHeight,
 	}
 }

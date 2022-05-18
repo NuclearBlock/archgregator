@@ -38,8 +38,13 @@ func HandleMsgStoreCode(index int, tx *types.Tx, node node.Node, db database.Dat
 		return fmt.Errorf("error while getting contract info: %s", err)
 	}
 
+	timestamp, err := time.Parse(time.RFC3339, tx.Timestamp)
+	if err != nil {
+		return fmt.Errorf("error while parsing time: %s", err)
+	}
+
 	return db.SaveWasmCode(
-		types.NewWasmCode(codeInfo, tx.TxHash, tx.Height),
+		types.NewWasmCode(codeInfo, tx.TxHash, timestamp, tx.Height),
 	)
 }
 

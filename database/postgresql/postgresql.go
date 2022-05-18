@@ -90,13 +90,14 @@ func (db *Database) SaveBlock(block *types.Block) error {
 // SaveWasmCode allows to store the wasm code from MsgStoreCode
 func (db *Database) SaveWasmCode(wasmCode types.WasmCode) error {
 	stmt := `
-	INSERT INTO wasm_code(creator, code_hash, code_id, size, tx_hash, height) 
-	VALUES ($1, $2, $3, $4, $5, $6) 
+	INSERT INTO wasm_code(creator, code_hash, code_id, size, tx_hash, saved_at, height) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7) 
 	ON CONFLICT DO NOTHING`
 
 	_, err := db.Sql.Exec(stmt,
 		wasmCode.Creator, wasmCode.CodeHash,
-		wasmCode.CodeID, wasmCode.Size, wasmCode.TxHash, wasmCode.Height,
+		wasmCode.CodeID, wasmCode.Size, wasmCode.TxHash,
+		wasmCode.SavedAt, wasmCode.Height,
 	)
 	if err != nil {
 		return fmt.Errorf("error while saving wasm code: %s", err)

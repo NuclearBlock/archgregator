@@ -23,6 +23,7 @@ CREATE TABLE wasm_code
     code_id                 BIGINT          NOT NULL UNIQUE,
     size                    INT             NOT NULL,
     tx_hash                 TEXT            NOT NULL,
+    saved_at                TIMESTAMP       NOT NULL,
     height                  BIGINT          NOT NULL
 );
 CREATE INDEX wasm_code_height_index ON wasm_code (height);
