@@ -98,7 +98,7 @@ CREATE TABLE contract_reward
     gas_rebate_to_user         BOOLEAN,
     collect_premium            BOOLEAN,
     premium_percentage_charged BIGINT,
-    reward_date                DATE  NOT NULL,
+    reward_date                TIMESTAMP  NOT NULL,
     height                     BIGINT  NOT NULL
 );
 CREATE INDEX contract_reward_reward_date_index ON contract_reward (reward_date);
