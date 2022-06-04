@@ -188,7 +188,7 @@ func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 			switch cosmosMsg := stdMsg.(type) {
 			case *wasmtypes.MsgStoreCode:
 				// Wasm code store
-				err = HandleMsgStoreCode(i, tx, w.node, w.db)
+				err = HandleMsgStoreCode(i, tx, cosmosMsg, w.node, w.db)
 				if err != nil {
 					w.logger.MsgError(tx, cosmosMsg, err)
 				}
