@@ -159,7 +159,8 @@ func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults, ts time.Time) erro
 		if strings.Contains(event.Type, gastrackertypes.ModuleName) {
 			err := HandleGasTrackerRewards(&event, r.Height, ts, w.db)
 			if err != nil {
-				return fmt.Errorf("error while handle gas tracker rewards: %s", err)
+				//return fmt.Errorf("error while handle gas tracker rewards: %s", err)
+				w.logger.Error("error while handle gas tracker rewards: ", err)
 			}
 		}
 	}
@@ -171,26 +172,44 @@ func (w Worker) ProcessEvents(r *tmctypes.ResultBlockResults, ts time.Time) erro
 func (w Worker) ProcessTransactions(txs []*types.Tx) error {
 	// Handle all the transactions inside the block
 	for _, tx := range txs {
+		// Process only successful txs
+		if !tx.Successful() {
+			continue
+		}
 		for i, msg := range tx.Body.Messages {
 			var stdMsg sdk.Msg
 			err := w.codec.UnpackAny(msg, &stdMsg)
 			if err != nil {
-				return fmt.Errorf("error while unpacking message: %s", err)
+				//  return fmt.Errorf("error while unpacking message: %s", err)
+				w.logger.Error("error while unpacking message: ", err)
+				continue
 			}
 			// Seek wasm and gastracker messages
 			switch cosmosMsg := stdMsg.(type) {
 			case *wasmtypes.MsgStoreCode:
 				// Wasm code store
-				return HandleMsgStoreCode(i, tx, w.node, w.db)
+				err = HandleMsgStoreCode(i, tx, w.node, w.db)
+				if err != nil {
+					w.logger.MsgError(tx, cosmosMsg, err)
+				}
 			case *wasmtypes.MsgInstantiateContract:
 				// Wasm contract instantiate
-				return HandleMsgInstantiateContract(i, tx, cosmosMsg, w.node, w.db)
+				err = HandleMsgInstantiateContract(i, tx, cosmosMsg, w.node, w.db)
+				if err != nil {
+					w.logger.MsgError(tx, cosmosMsg, err)
+				}
 			case *wasmtypes.MsgExecuteContract:
 				// Wasm contract execute
-				return HandleMsgExecuteContract(i, tx, cosmosMsg, w.db)
+				err = HandleMsgExecuteContract(i, tx, cosmosMsg, w.db)
+				if err != nil {
+					w.logger.MsgError(tx, cosmosMsg, err)
+				}
 			case *gastrackertypes.MsgSetContractMetadata:
 				// Gastracker metadata set
-				return HandleMsgSetMetadata(i, tx, cosmosMsg, w.db)
+				err = HandleMsgSetMetadata(i, tx, cosmosMsg, w.db)
+				if err != nil {
+					w.logger.MsgError(tx, cosmosMsg, err)
+				}
 			}
 		}
 	}
